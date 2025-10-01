@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOMIS — Digital, Dazzling, Delightfully Chaotic</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="brand">NOMIS</header>
+
+      <main class="board">
+        <button class="pad green" data-index="0" aria-label="Green"></button>
+        <button class="pad red" data-index="1" aria-label="Red"></button>
+        <button class="pad blue" data-index="2" aria-label="Blue"></button>
+        <button class="pad yellow" data-index="3" aria-label="Yellow"></button>
+
+        <div class="speaker">
+        <div class="label">NOMIS</div>
+        <div class="logo">
+          <img src="assets/nomis-logo.svg" alt="NOMIS" width="180" height="32" />
+        </div>
+          <div class="logo" aria-hidden="true">NOMIS</div>
+          <div class="controls">
+            <button id="startBtn" class="primary">Start</button>
+            <select id="modeSelect" aria-label="Mode">
+              <option value="classic">Classic</option>
+              <option value="speed">Speed</option>
+              <option value="zen">Zen</option>
+              <option value="chaos">Chaos</option>
+            </select>
+            <button id="pauseBtn">Pause</button>
+            <button id="settingsBtn">Settings</button>
+          </div>
+        </div>
+      </main>
+
+      <section class="hud">
+        <div>Score: <span id="score">0</span></div>
+        <div>Best: <span id="best">0</span></div>
+        <div>Lives: <span id="lives">3</span></div>
+      </section>
+
+      <section class="timer">
+        <div id="timerBar"></div>
+      </section>
+
+      <section class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ol id="boardList"></ol>
+      </section>
+
+      <!-- Start Overlay -->
+      <div id="startOverlay" class="overlay" aria-hidden="false">
+        <div class="panel">
+          <h2>NOMIS Says</h2>
+          <p>Digital, Dazzling, and Delightfully Chaotic. Ready to play?</p>
+          <label>
+            Mode:
+            <select id="startModeSelect" aria-label="Start Mode">
+              <option value="classic">Classic</option>
+              <option value="speed">Speed</option>
+              <option value="zen">Zen</option>
+              <option value="chaos">Chaos</option>
+            </select>
+          </label>
+          <div class="panel-actions">
+            <button id="beginBtn" class="primary">Begin</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div id="pauseOverlay" class="overlay hidden" aria-hidden="true">
+        <div class="panel">
+          <h2>Paused</h2>
+          <p>Take a breath. Or a victory sip.</p>
+          <div class="panel-actions">
+            <button id="resumeBtn" class="primary">Resume</button>
+            <button id="quitBtn">Quit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameOverOverlay" class="overlay hidden" aria-hidden="true">
+        <div class="panel">
+          <h2 id="overlayTitle">Game Over</h2>
+          <p id="overlayMsg">That sequence twisted harder than my spaghetti code.</p>
+          <label>
+            Name:
+            <input id="playerName" placeholder="Player" />
+          </label>
+          <div class="panel-actions">
+            <button id="submitScore" class="primary">Submit Score</button>
+            <button id="closeOverlay">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Overlay -->
+      <div id="settingsOverlay" class="overlay hidden" aria-hidden="true">
+        <div class="panel">
+          <h2>Settings</h2>
+          <label>
+            Theme:
+            <select id="themeSelect">
+              <option value="neon">Neon</option>
+              <option value="grid">Grid</option>
+              <option value="mono">Mono</option>
+            </select>
+          </label>
+          <label>
+            Sound Pack:
+            <select id="soundPackSelect">
+              <option value="classic">Classic</option>
+              <option value="synth">Synth</option>
+              <option value="soft">Soft</option>
+            </select>
+          </label>
+          <label>
+            <input type="checkbox" id="muteSfx" /> Mute SFX
+          </label>
+          <label>
+            <input type="checkbox" id="muteMusic" /> Mute Music
+          </label>
+          <div class="panel-actions">
+            <button id="saveSettingsBtn" class="primary">Save</button>
+            <button id="closeSettingsBtn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+  </html>

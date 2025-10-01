@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNISA Theme Preview</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Helvetica Neue", sans-serif; }
+    body { margin: 0; background: #0d0d14; color: #ffffff; }
+    header { padding: 16px 24px; border-bottom: 1px solid #1f1f29; display: flex; align-items: center; justify-content: space-between; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; padding: 24px; }
+    .card { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); }
+    .swatch { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .swatch div { padding: 16px; text-align: center; font-size: 12px; letter-spacing: 0.2px; }
+    .panel { padding: 16px; }
+    .title { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+    .desc { opacity: 0.8; font-size: 13px; }
+    .accent-btn { margin-top: 12px; padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: transform 0.1s ease, filter 0.2s ease, background 0.2s ease; animation: accentPulse 2s ease-in-out infinite; }
+    .accent-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 6px 18px rgba(99,194,255,0.35); }
+    .accent-btn:active { transform: translateY(0px) scale(0.98); filter: brightness(0.95); box-shadow: 0 2px 8px rgba(99,194,255,0.25); }
+
+    @keyframes accentPulse {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.02); filter: brightness(1.06); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    /* Default */
+    .default-bg { background: #0d0d14; color: #ffffff; }
+    .default-panel { background: rgba(31,31,41,0.9); }
+    .default-text { background: #ffffff; color: #0d0d14; }
+    .default-accent { background: #63c2ff; color: #0d0d14; }
+
+    /* Retro */
+    .retro-bg { background: #1e140a; color: #ffea99; }
+    .retro-panel { background: rgba(66,59,31,0.92); }
+    .retro-text { background: #ffea99; color: #1e140a; }
+    .retro-accent { background: #ff9933; color: #1e140a; }
+
+    /* Sci-Fi */
+    .scifi-bg { background: #050f1f; color: #d9f2ff; }
+    .scifi-panel { background: rgba(36,48,58,0.94); }
+    .scifi-text { background: #d9f2ff; color: #050f1f; }
+    .scifi-accent { background: #3db8ff; color: #050f1f; }
+
+    /* Fantasy */
+    .fantasy-bg { background: #1e0a29; color: #f2e6ff; }
+    .fantasy-panel { background: rgba(66,41,82,0.94); }
+    .fantasy-text { background: #f2e6ff; color: #1e0a29; }
+    .fantasy-accent { background: #ffd633; color: #1e0a29; }
+  </style>
+  <script>
+    function highlight(cardId) {
+      document.querySelectorAll('.card').forEach(c => c.style.outline = 'none');
+      const c = document.getElementById(cardId);
+      if (c) c.style.outline = '3px solid rgba(255,255,255,0.25)';
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="title">UNISA Theme Preview</div>
+      <div class="desc">Visual reference of ThemeManager palettes: Default, Retro, Sci-Fi, Fantasy</div>
+    </div>
+    <div class="desc">Click a card's accent button to highlight.</div>
+  </header>
+  <main class="grid">
+    <section class="card" id="card-default">
+      <div class="swatch default-bg">
+        <div>Background<br>#0D0D14</div>
+        <div class="default-panel">Panel<br>rgba(31,31,41,0.9)</div>
+        <div class="default-text">Text<br>#FFFFFF</div>
+        <div class="default-accent">Accent<br>#63C2FF</div>
+      </div>
+      <div class="panel default-panel">
+        <div class="title">Default</div>
+        <div class="desc">Clean neutral base with cool blue accent.</div>
+        <button class="accent-btn default-accent" onclick="highlight('card-default')">Highlight</button>
+      </div>
+    </section>
+
+    <section class="card" id="card-retro">
+      <div class="swatch retro-bg">
+        <div>Background<br>#1E140A</div>
+        <div class="retro-panel">Panel<br>rgba(66,59,31,0.92)</div>
+        <div class="retro-text">Text<br>#FFEA99</div>
+        <div class="retro-accent">Accent<br>#FF9933</div>
+      </div>
+      <div class="panel retro-panel">
+        <div class="title">Retro</div>
+        <div class="desc">Warm vintage vibes with punchy orange accent.</div>
+        <button class="accent-btn retro-accent" onclick="highlight('card-retro')">Highlight</button>
+      </div>
+    </section>
+
+    <section class="card" id="card-scifi">
+      <div class="swatch scifi-bg">
+        <div>Background<br>#050F1F</div>
+        <div class="scifi-panel">Panel<br>rgba(36,48,58,0.94)</div>
+        <div class="scifi-text">Text<br>#D9F2FF</div>
+        <div class="scifi-accent">Accent<br>#3DB8FF</div>
+      </div>
+      <div class="panel scifi-panel">
+        <div class="title">Sci-Fi</div>
+        <div class="desc">Cool futuristic with energetic cyan accent.</div>
+        <button class="accent-btn scifi-accent" onclick="highlight('card-scifi')">Highlight</button>
+      </div>
+    </section>
+
+    <section class="card" id="card-fantasy">
+      <div class="swatch fantasy-bg">
+        <div>Background<br>#1E0A29</div>
+        <div class="fantasy-panel">Panel<br>rgba(66,41,82,0.94)</div>
+        <div class="fantasy-text">Text<br>#F2E6FF</div>
+        <div class="fantasy-accent">Accent<br>#FFD633</div>
+      </div>
+      <div class="panel fantasy-panel">
+        <div class="title">Fantasy</div>
+        <div class="desc">Mystical purple base with radiant gold accent.</div>
+        <button class="accent-btn fantasy-accent" onclick="highlight('card-fantasy')">Highlight</button>
+      </div>
+    </section>
+  </main>
+  <footer style="padding: 12px 24px; opacity: 0.7; font-size: 12px;">
+    Generated preview for quick visual review of theme palettes.
+  </footer>
+  </body>
+  </html>

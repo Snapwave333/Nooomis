@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="500" viewBox="0 0 1500 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0f17"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#65c3ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <g transform="translate(120,260)">
+    <circle cx="0" cy="0" r="110" fill="none" stroke="url(#brand)" stroke-width="20"/>
+    <text x="-60" y="25" font-family="Segoe UI, Arial, sans-serif" font-size="128" font-weight="700" fill="#e2e8f0">N</text>
+  </g>
+  <text x="320" y="270" font-family="Segoe UI, Arial, sans-serif" font-size="128" font-weight="800" fill="#e2e8f0">NOMIS</text>
+  <text x="320" y="320" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#94a3b8">Digital, Dazzling, Delightfully Chaotic</text>
+</svg>

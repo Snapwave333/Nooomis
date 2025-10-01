@@ -1,0 +1,93 @@
+:root {
+  --bg: #0b0f17;
+  --panel: #121826;
+  --text: #e6f0ff;
+  --accent: #65c3ff;
+  --green: #2cff7c;
+  --red: #ff3b3b;
+  --blue: #3bb7ff;
+  --yellow: #ffd447;
+}
+
+.theme-grid {
+  --bg: #0a0a0a;
+  --panel: #111111;
+  --text: #e5e5e5;
+  --accent: #00ffa3;
+}
+.theme-mono {
+  --bg: #0c0c0c;
+  --panel: #101010;
+  --text: #cccccc;
+  --accent: #bbbbbb;
+  --green: #9bd3ae;
+  --red: #d39b9b;
+  --blue: #9bb8d3;
+  --yellow: #d3ca9b;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; font-family: Inter, system-ui, sans-serif; background: radial-gradient(1200px 800px at 50% 0%, #0f1423, var(--bg)); color: var(--text);
+}
+
+#app { max-width: 900px; margin: 0 auto; padding: 24px; }
+.brand { text-align: center; font-weight: 800; letter-spacing: 0.2em; color: var(--accent); text-shadow: 0 0 8px rgba(101, 195, 255, 0.7); }
+.theme-grid .brand { text-shadow: 0 0 6px rgba(0,255,163,0.6); }
+.theme-mono .brand { text-shadow: none; }
+
+.board {
+  position: relative; margin: 30px auto; width: 560px; height: 560px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #1b2438, #0b0f17 60%);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.45), inset 0 40px 80px rgba(0,0,0,0.35);
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 16px; padding: 28px;
+}
+.theme-grid .board { background: repeating-linear-gradient(45deg, #111 0 20px, #0d0d0d 20px 40px); }
+.theme-mono .board { background: radial-gradient(circle at 50% 50%, #121212, #0c0c0c 60%); }
+
+.pad { border: none; border-radius: 24px; filter: saturate(1.2); cursor: pointer; transition: transform 0.05s, box-shadow 0.1s; }
+.pad:active { transform: translateY(2px); }
+.pad.green { background: linear-gradient(#0e3, var(--green)); box-shadow: 0 0 30px rgba(44,255,124,0.6); }
+.pad.red { background: linear-gradient(#d00, var(--red)); box-shadow: 0 0 30px rgba(255,59,59,0.6); }
+.pad.blue { background: linear-gradient(#07c, var(--blue)); box-shadow: 0 0 30px rgba(59,183,255,0.6); }
+.pad.yellow { background: linear-gradient(#db3, var(--yellow)); box-shadow: 0 0 30px rgba(255,212,71,0.6); }
+.theme-mono .pad.green, .theme-mono .pad.red, .theme-mono .pad.blue, .theme-mono .pad.yellow { box-shadow: none; filter: contrast(0.9) brightness(0.95); }
+.pad.playback { filter: brightness(1.35); box-shadow: 0 0 45px currentColor; }
+
+/* Strong press animation */
+.pad.strong { animation: padPop 160ms ease-out; }
+@keyframes padPop {
+  0% { transform: scale(1.0); filter: brightness(1.0); }
+  50% { transform: scale(1.05); filter: brightness(1.5); }
+  100% { transform: scale(1.0); filter: brightness(1.0); }
+}
+
+.speaker {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 240px; height: 240px; border-radius: 50%; background: var(--panel);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 12px 30px rgba(255,255,255,0.06), 0 0 calc(var(--glow, 0) * 30px) rgba(101,195,255,0.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+}
+.speaker .label { font-weight: 700; letter-spacing: 0.3em; color: var(--accent); }
+.speaker .controls { display: flex; gap: 8px; }
+.primary { background: var(--accent); color: #031225; border: none; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+select, button { background: #1b2236; color: var(--text); border: 1px solid #2a3556; border-radius: 8px; padding: 6px 10px; }
+
+.hud { display: flex; gap: 24px; align-items: center; justify-content: center; }
+
+.leaderboard { margin-top: 20px; background: #0f1322; border: 1px solid #1c2540; border-radius: 12px; padding: 12px; }
+
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; }
+.overlay.hidden { display: none; }
+.panel { background: #11182a; border: 1px solid #263459; border-radius: 12px; padding: 18px; width: 360px; }
+.panel-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+.overlay .panel h2 { margin-top: 0; color: var(--accent); }
+.overlay .panel p { opacity: 0.9; }
+.board.dimmed { filter: blur(2px) brightness(0.8); pointer-events: none; }
+
+@media (max-width: 700px) {
+  .board { width: 92vw; height: 92vw; }
+  .speaker { width: 40vw; height: 40vw; }
+}
