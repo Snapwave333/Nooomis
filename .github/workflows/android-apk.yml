@@ -1,0 +1,26 @@
+name: Build Android APK
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'tools/build_android.ps1'
+      - 'web/**'
+jobs:
+  build-android:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Build Android
+        shell: pwsh
+        run: |
+          $env:NOMIS_FAST_RELAUNCH = '0'
+          ./tools/build_android.ps1
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nomis-android-apk
+          path: ${{ github.workspace }}\**\app-debug.apk

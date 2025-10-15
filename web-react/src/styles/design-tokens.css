@@ -1,0 +1,16 @@
+:root {
+  --bg-900: #071024;
+  --bg-800: #0b1221;
+  --surface: #0f1624;
+  --accent-1: #00ffd0;
+  --accent-2: #7c4dff;
+  --accent-3: #ffb74d;
+  --muted: #9aa7b8;
+  --success: #3EE17A;
+  --danger: #ff5c5c;
+  --white: #ffffff;
+  
+  /* Shadows */
+  --shadow-soft: 0 10px 30px rgba(2,6,23,0.6);
+  --shadow-rim: 0 6px 24px rgba(0, 255, 208, 0.12);
+}

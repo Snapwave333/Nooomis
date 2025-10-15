@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOOOMIS — Digital, Dazzling, Delightfully Chaotic</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="theme.css" />
+    <script src="progression.js"></script>
+    <script src="challenges.js"></script>
+    <script src="unlocks.js"></script>
+    <script src="ghost.js"></script>
+    <script src="challenge.js"></script>
+    <script src="daily-rewards.js"></script>
+    <script src="meta-arc.js"></script>
+    <script src="boss-fight.js"></script>
+    <script src="new-game-plus.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Menu Button -->
+      <button class="menu-button" id="menuButton" onclick="toggleMenu()">
+        ☰
+      </button>
+      
+      <!-- Menu Dropdown -->
+      <div class="menu-dropdown" id="menuDropdown">
+        <button class="menu-item" onclick="openTutorial()">📚 Tutorial</button>
+        <button class="menu-item" onclick="openCredits()">ℹ️ Credits</button>
+        <button class="menu-item" onclick="openHelp()">❓ Help</button>
+        <button class="menu-item" onclick="exportSave()">💾 Export Save</button>
+        <button class="menu-item" onclick="importSave()">📁 Import Save</button>
+        <button class="menu-item" onclick="resetGame()">🔄 Reset Game</button>
+        <button class="menu-item quit-button" onclick="quitApp()">🚪 Quit App</button>
+      </div>
+
+      <header class="brand">NOOOMIS</header>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()" title="Go Back">← Back</button>
+        
+        <!-- Tab Navigation -->
+        <section class="tab-navigation">
+          <button class="tab-button active" onclick="showTab('game')" id="gameTab">🎮 Game</button>
+          <button class="tab-button" onclick="showTab('leaderboard')" id="leaderboardTab">🏆 Leaderboard</button>
+          <button class="tab-button" onclick="showTab('settings')" id="settingsTab">⚙️ Settings</button>
+        </section>
+
+      <!-- Tab Content -->
+      <section class="tab-content">
+        <!-- Game Tab -->
+        <div class="tab-panel active" id="gamePanel">
+          <div class="game-content">
+            <main class="board">
+              <button class="pad green" data-index="0" aria-label="Green"></button>
+              <button class="pad red" data-index="1" aria-label="Red"></button>
+              <button class="pad blue" data-index="2" aria-label="Blue"></button>
+              <button class="pad yellow" data-index="3" aria-label="Yellow"></button>
+
+              <div class="speaker">
+              <div class="logo">
+                <img src="assets/nomis-logo.svg" alt="Game Logo" width="180" height="32" />
+              </div>
+                <div class="controls">
+                  <button id="startBtn" class="primary">Start</button>
+                  <select id="modeSelect" aria-label="Mode">
+                    <option value="classic">Classic</option>
+                    <option value="speed">Speed</option>
+                    <option value="zen">Zen</option>
+                    <option value="chaos">Chaos</option>
+                    <option value="mirror" disabled>Mirror (Locked)</option>
+                    <option value="echo" disabled>Echo (Locked)</option>
+                    <option value="survival" disabled>Survival (Locked)</option>
+                    <option value="boss" disabled>Boss (Locked)</option>
+                    <option value="liberation" disabled>Liberation (Unlocked after Boss Fight)</option>
+                  </select>
+                  <button id="pauseBtn">Pause</button>
+                </div>
+              </div>
+            </main>
+
+            <section class="hud">
+              <div>Score: <span id="score">0</span></div>
+              <div>Best: <span id="best">0</span></div>
+              <div>Lives: <span id="lives">3</span></div>
+            </section>
+
+            <section class="timer">
+              <div id="timerBar"></div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div class="tab-panel" id="leaderboardPanel">
+          <div class="leaderboard-content">
+            <h3>Leaderboard</h3>
+            <div id="leaderboardList" class="leaderboard-list">
+              <!-- Leaderboard entries will be populated here -->
+            </div>
+            <button class="button" onclick="refreshLeaderboard()">Refresh</button>
+          </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-panel" id="settingsPanel">
+          <div class="settings-content">
+            <h3>Quick Settings</h3>
+            <div class="quick-settings">
+              <div class="setting-item">
+                <label for="quickTheme">Theme:</label>
+                <select id="quickTheme">
+                  <option value="neon">Neon</option>
+                  <option value="grid">Grid</option>
+                  <option value="mono">Mono</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label for="quickVolume">Volume:</label>
+                <input type="range" id="quickVolume" min="0" max="1" step="0.1" value="1">
+              </div>
+              <div class="setting-item">
+                <label for="quickColorblind">Colorblind Mode:</label>
+                <input type="checkbox" id="quickColorblind">
+              </div>
+              <div class="setting-item">
+                <label for="quickVibration">Vibration:</label>
+                <input type="checkbox" id="quickVibration">
+              </div>
+            </div>
+            <button class="button" onclick="openFullSettings()">Full Settings</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Start Overlay -->
+      <div id="startOverlay" class="overlay" aria-hidden="false">
+        <div class="panel">
+          <h2>NOOOMIS Says</h2>
+          <p>Digital, Dazzling, and Delightfully Chaotic. Ready to play?</p>
+          <p><a href="settings.html">Adjust settings</a> before you begin.</p>
+          <label>
+            Mode:
+            <select id="startModeSelect" aria-label="Start Mode">
+              <option value="classic">Classic</option>
+              <option value="speed">Speed</option>
+              <option value="zen">Zen</option>
+              <option value="chaos">Chaos</option>
+              <option value="mirror" disabled>Mirror (Locked)</option>
+              <option value="echo" disabled>Echo (Locked)</option>
+              <option value="survival" disabled>Survival (Locked)</option>
+              <option value="boss" disabled>Boss (Locked)</option>
+              <option value="liberation" disabled>Liberation (Unlocked after Boss Fight)</option>
+            </select>
+          </label>
+          <div class="panel-actions">
+            <button id="beginBtn" class="primary">Begin</button>
+            <a class="button" href="welcome.html">Back</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div id="pauseOverlay" class="overlay hidden" aria-hidden="true">
+        <div class="panel">
+          <h2>Paused</h2>
+          <p>Take a breath. Or a victory sip.</p>
+          <div class="panel-actions">
+            <button id="resumeBtn" class="primary">Resume</button>
+            <button id="quitBtn">Quit Game</button>
+            <button id="quitAppBtn" class="quit-app-btn">Quit App</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameOverOverlay" class="overlay hidden" aria-hidden="true">
+        <div class="panel">
+          <h2 id="overlayTitle">Game Over</h2>
+          <p id="overlayMsg">That sequence twisted harder than my spaghetti code.</p>
+          <label>
+            Name:
+            <input id="playerName" placeholder="Player" />
+          </label>
+          <div class="panel-actions">
+            <button id="submitScore" class="primary">Submit Score</button>
+            <button id="closeOverlay">Close</button>
+          </div>
+        </div>
+      </div>
+
+      
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+  </html>

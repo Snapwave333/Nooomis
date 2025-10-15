@@ -17,6 +17,11 @@ namespace UNISA.Core
             root.AddComponent<SettingsManager>();
             root.AddComponent<ThemeManager>();
 
+            // Scoreboard persistence
+            var scoreboardGO = new GameObject("Scoreboard");
+            scoreboardGO.transform.SetParent(root.transform);
+            scoreboardGO.AddComponent<Scoreboard>();
+
             // Audio buses
             var audioRoot = new GameObject("AudioRoot");
             audioRoot.transform.SetParent(root.transform);

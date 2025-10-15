@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaderboard — NOOOMIS</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="brand">NOOOMIS</header>
+
+      <main class="leaderboard-main">
+        <h1>Leaderboard</h1>
+        <p>Top scores from players around the world</p>
+        
+        <div class="leaderboard-container">
+          <ol id="boardList" class="leaderboard-list"></ol>
+        </div>
+
+        <div class="leaderboard-actions">
+          <a href="index.html" class="button primary">Back to Game</a>
+          <button id="clearBoard" class="button">Clear Scores</button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Leaderboard functionality
+      const boardList = document.getElementById('boardList');
+      const clearBoard = document.getElementById('clearBoard');
+
+      function renderBoard() {
+        const raw = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        boardList.innerHTML = '';
+        
+        if (raw.length === 0) {
+          const li = document.createElement('li');
+          li.textContent = 'No scores yet. Be the first to play!';
+          li.className = 'no-scores';
+          boardList.appendChild(li);
+          return;
+        }
+
+        raw.slice(0, 20).forEach(({ name, score }, i) => {
+          const li = document.createElement('li');
+          li.className = 'score-entry';
+          
+          const rank = document.createElement('span');
+          rank.className = 'rank';
+          rank.textContent = `#${i + 1}`;
+          
+          const player = document.createElement('span');
+          player.className = 'player';
+          player.textContent = name;
+          
+          const scoreSpan = document.createElement('span');
+          scoreSpan.className = 'score';
+          scoreSpan.textContent = score;
+          
+          li.appendChild(rank);
+          li.appendChild(player);
+          li.appendChild(scoreSpan);
+          boardList.appendChild(li);
+        });
+      }
+
+      clearBoard.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all scores?')) {
+          localStorage.removeItem('leaderboard');
+          renderBoard();
+        }
+      });
+
+      // Load and display leaderboard
+      renderBoard();
+    </script>
+
+    <style>
+      .leaderboard-main {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 24px;
+        text-align: center;
+      }
+
+      .leaderboard-main h1 {
+        color: var(--accent);
+        margin-bottom: 8px;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+
+      .leaderboard-main p {
+        opacity: 0.8;
+        margin-bottom: 32px;
+        font-size: 1.1rem;
+      }
+
+      .leaderboard-container {
+        background: var(--panel);
+        border: 1px solid #2a3556;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+        min-height: 300px;
+      }
+
+      .leaderboard-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+      }
+
+      .score-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.2s;
+      }
+
+      .score-entry:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .score-entry:first-child {
+        background: linear-gradient(135deg, var(--accent), rgba(101, 195, 255, 0.3));
+        color: #031225;
+        font-weight: 700;
+      }
+
+      .score-entry:nth-child(2) {
+        background: linear-gradient(135deg, #c0c0c0, rgba(192, 192, 192, 0.3));
+        color: #1a1a1a;
+        font-weight: 600;
+      }
+
+      .score-entry:nth-child(3) {
+        background: linear-gradient(135deg, #cd7f32, rgba(205, 127, 50, 0.3));
+        color: #1a1a1a;
+        font-weight: 600;
+      }
+
+      .rank {
+        font-weight: 700;
+        min-width: 40px;
+        color: var(--accent);
+      }
+
+      .player {
+        flex: 1;
+        margin: 0 16px;
+        font-weight: 500;
+      }
+
+      .score {
+        font-weight: 700;
+        color: var(--text);
+        font-size: 1.1rem;
+      }
+
+      .no-scores {
+        text-align: center;
+        padding: 40px;
+        opacity: 0.6;
+        font-style: italic;
+      }
+
+      .leaderboard-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #1b2236;
+        color: var(--text);
+        border: 1px solid #2a3556;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .button:hover {
+        background: #2a3556;
+        border-color: var(--accent);
+      }
+
+      .button.primary {
+        background: var(--accent);
+        color: #031225;
+        border-color: var(--accent);
+      }
+
+      .button.primary:hover {
+        background: rgba(101, 195, 255, 0.9);
+      }
+
+      @media (max-width: 600px) {
+        .leaderboard-main {
+          padding: 16px;
+        }
+        
+        .leaderboard-main h1 {
+          font-size: 2rem;
+        }
+        
+        .score-entry {
+          padding: 8px 12px;
+          font-size: 0.9rem;
+        }
+        
+        .leaderboard-actions {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .button {
+          width: 200px;
+        }
+      }
+    </style>
+  </body>
+</html>

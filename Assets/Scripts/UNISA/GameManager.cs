@@ -101,6 +101,17 @@ namespace UNISA.Core
         private void EnterState(GameState state)
         {
             UIManager.Instance?.ShowMenu(state);
+            
+            // Clean up any lingering settings UI when transitioning away from settings
+            if (state != GameState.Settings)
+            {
+                var settingsBuilder = FindObjectOfType<UNISA.UIRuntime.SettingsUIBuilder>();
+                if (settingsBuilder != null)
+                {
+                    Destroy(settingsBuilder.gameObject);
+                }
+            }
+            
             switch (state)
             {
                 case GameState.MainMenu:

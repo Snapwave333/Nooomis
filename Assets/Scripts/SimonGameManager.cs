@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UNISA.Core;
 
 namespace Unisa.Simon
 {
@@ -73,6 +74,7 @@ namespace Unisa.Simon
             if (buttonIndex == expected)
             {
                 buttons[buttonIndex].Pulse(true);
+                Haptics.Vibrate(20, 200);
                 inputIndex++;
                 AudioManager.Instance?.PlayTone(buttonIndex);
                 if (mode == GameMode.Speed) nextInputDeadline = Time.time + pressWindow;
@@ -80,6 +82,7 @@ namespace Unisa.Simon
                 if (inputIndex >= sequence.Count)
                 {
                     score++;
+                    SaveSystem.Instance?.UpdateBestScore(score);
                     OnScoreChanged?.Invoke(score);
                     OnSuccess?.Invoke();
                     inputIndex = 0;
@@ -97,6 +100,7 @@ namespace Unisa.Simon
         {
             OnFail?.Invoke();
             AudioManager.Instance?.PlayFail();
+            Haptics.Vibrate(60, 255);
 
             if (mode == GameMode.Zen)
             {
@@ -114,6 +118,9 @@ namespace Unisa.Simon
                     bestScore = score;
                     PlayerPrefs.SetInt("BestScore", bestScore);
                     OnBestScoreChanged?.Invoke(bestScore);
+                    // Also push to UNISA.Scoreboard if available
+                    var sb = GameObject.FindObjectOfType<Scoreboard>();
+                    if (sb != null) sb.Add(score);
                 }
                 OnGameOver?.Invoke();
                 // reset game

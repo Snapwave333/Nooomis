@@ -9,6 +9,7 @@ namespace UNISA.UIRuntime
         private Canvas canvas;
         private RectTransform root;
         private Text scoreText;
+        private bool isBuilt = false;
 
         private void Start()
         {
@@ -18,9 +19,22 @@ namespace UNISA.UIRuntime
             UIManager.Instance.UpdateScore(GameManager.Instance.Score);
         }
 
+        private void OnDestroy()
+        {
+            // Clean up the canvas when this component is destroyed
+            if (canvas != null)
+            {
+                DestroyImmediate(canvas.gameObject);
+            }
+        }
+
         private void Build()
         {
+            // Prevent duplicate canvas creation
+            if (isBuilt) return;
+            
             canvas = new GameObject("HUDCanvas").AddComponent<Canvas>();
+            isBuilt = true;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvas.gameObject.AddComponent<GraphicRaycaster>();

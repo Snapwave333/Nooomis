@@ -8,6 +8,7 @@ namespace UNISA.UIRuntime
     {
         private Canvas canvas;
         private RectTransform root;
+        private bool isBuilt = false;
 
         private void Start()
         {
@@ -16,9 +17,22 @@ namespace UNISA.UIRuntime
             UIManager.Instance.ShowMenu(GameManager.Instance.CurrentState);
         }
 
+        private void OnDestroy()
+        {
+            // Clean up the canvas when this component is destroyed
+            if (canvas != null)
+            {
+                DestroyImmediate(canvas.gameObject);
+            }
+        }
+
         private void Build()
         {
+            // Prevent duplicate canvas creation
+            if (isBuilt) return;
+            
             canvas = new GameObject("MainMenuCanvas").AddComponent<Canvas>();
+            isBuilt = true;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvas.gameObject.AddComponent<GraphicRaycaster>();

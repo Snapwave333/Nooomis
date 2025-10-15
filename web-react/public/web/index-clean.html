@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOOOMIS - Clean</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #071024;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ffd0;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(0, 255, 208, 0.3);
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 2rem;
+            max-width: 400px;
+        }
+        
+        .pad {
+            width: 180px;
+            height: 180px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pad:hover {
+            transform: scale(1.02);
+        }
+        
+        .pad.active {
+            transform: scale(1.06);
+            box-shadow: 0 0 30px currentColor;
+        }
+        
+        .pad[data-pad="0"] { background: #22c55e; }
+        .pad[data-pad="1"] { background: #ef4444; }
+        .pad[data-pad="2"] { background: #3b82f6; }
+        .pad[data-pad="3"] { background: #eab308; }
+        
+        .game-info {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+        
+        .info-item {
+            text-align: center;
+        }
+        
+        .info-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: #00ffd0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #00ffd0;
+            color: #071024;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: #00e6bb;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .mode-select {
+            padding: 8px 16px;
+            border: 2px solid #00ffd0;
+            border-radius: 8px;
+            background: transparent;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 16, 36, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .game-over.show {
+            display: flex;
+        }
+        
+        .game-over h2 {
+            font-size: 2rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+        
+        .final-score {
+            font-size: 1.5rem;
+            color: #00ffd0;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 600px) {
+            .pad {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="game-title">NOOOMIS</h1>
+    
+    <div class="game-info">
+        <div class="info-item">
+            <span class="info-label">Score</span>
+            <span class="info-value" id="score">0</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Round</span>
+            <span class="info-value" id="round">0</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Lives</span>
+            <span class="info-value" id="lives">3</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Best</span>
+            <span class="info-value" id="best">0</span>
+        </div>
+    </div>
+    
+    <div class="game-board">
+        <button class="pad" data-pad="0" aria-label="Green pad"></button>
+        <button class="pad" data-pad="1" aria-label="Red pad"></button>
+        <button class="pad" data-pad="2" aria-label="Blue pad"></button>
+        <button class="pad" data-pad="3" aria-label="Yellow pad"></button>
+    </div>
+    
+    <div class="controls">
+        <select class="mode-select" id="mode">
+            <option value="classic">Classic</option>
+            <option value="speed">Speed</option>
+            <option value="zen">Zen</option>
+        </select>
+        <button class="btn" id="start">Start Game</button>
+        <button class="btn" id="pause" disabled>Pause</button>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <h2>Game Over</h2>
+        <div class="final-score">Final Score: <span id="finalScore">0</span></div>
+        <button class="btn" id="playAgain">Play Again</button>
+    </div>
+    
+    <script src="simon-core.js"></script>
+    <script>
+        const game = new SimonCore();
+        let isPaused = false;
+        
+        // UI elements
+        const startBtn = document.getElementById('start');
+        const pauseBtn = document.getElementById('pause');
+        const modeSelect = document.getElementById('mode');
+        const gameOverEl = document.getElementById('gameOver');
+        const finalScoreEl = document.getElementById('finalScore');
+        const playAgainBtn = document.getElementById('playAgain');
+        const bestEl = document.getElementById('best');
+        
+        // Load best score
+        bestEl.textContent = localStorage.getItem('nooomis-best') || '0';
+        
+        // Game callbacks
+        game.onGameOver = (score) => {
+            finalScoreEl.textContent = score;
+            gameOverEl.classList.add('show');
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            bestEl.textContent = localStorage.getItem('nooomis-best') || '0';
+        };
+        
+        // Event listeners
+        startBtn.addEventListener('click', () => {
+            const mode = modeSelect.value;
+            game.startGame(mode);
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            gameOverEl.classList.remove('show');
+            game.updateUI();
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+            game.isPlayerTurn = !isPaused && !game.isPlaying;
+        });
+        
+        playAgainBtn.addEventListener('click', () => {
+            gameOverEl.classList.remove('show');
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+        
+        // Pad clicks
+        document.querySelectorAll('.pad').forEach((pad, index) => {
+            pad.addEventListener('click', () => {
+                if (!isPaused) {
+                    game.playerPress(index);
+                }
+            });
+        });
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (isPaused) return;
+            
+            const keyMap = {
+                '1': 0, 'q': 0, 'ArrowLeft': 0,
+                '2': 1, 'w': 1, 'ArrowDown': 1,
+                '3': 2, 'a': 2, 'ArrowUp': 2,
+                '4': 3, 's': 3, 'ArrowRight': 3
+            };
+            
+            const padIndex = keyMap[e.key.toLowerCase()] ?? keyMap[e.code];
+            if (padIndex !== undefined) {
+                e.preventDefault();
+                game.playerPress(padIndex);
+            }
+        });
+    </script>
+</body>
+</html>

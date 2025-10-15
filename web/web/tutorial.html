@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOOOMIS — Tutorial</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .tutorial-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #031225 0%, #0a1a2e 50%, #16213e 100%);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tutorial-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .tutorial-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #65c3ff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tutorial-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background: var(--accent);
+            color: #031225;
+        }
+        
+        .skip-tutorial-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+        }
+        
+        .skip-tutorial-btn:hover {
+            background: #ff3333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 68, 68, 0.4);
+        }
+        
+        .skip-tutorial-btn:active {
+            transform: translateY(0);
+        }
+        
+        .tutorial-content {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .tutorial-step {
+            background: var(--panel);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .tutorial-step.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .tutorial-step.completed {
+            opacity: 0.7;
+            border-color: #4ecdc4;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .step-number {
+            background: var(--accent);
+            color: #031225;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .step-content {
+            line-height: 1.6;
+        }
+        
+        .step-content p {
+            margin-bottom: 12px;
+        }
+        
+        .step-content ul {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+        
+        .step-content li {
+            margin-bottom: 6px;
+        }
+        
+        .demo-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-width: 200px;
+            margin: 16px auto;
+        }
+        
+        .demo-pad {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .demo-pad:hover {
+            transform: scale(1.05);
+        }
+        
+        .demo-pad.active {
+            box-shadow: 0 0 20px var(--accent);
+        }
+        
+        .demo-pad[data-color="green"] { background: #4ecdc4; }
+        .demo-pad[data-color="red"] { background: #ff6b6b; }
+        .demo-pad[data-color="blue"] { background: #65c3ff; }
+        .demo-pad[data-color="yellow"] { background: #ffe66d; }
+        
+        .demo-pad::after {
+            content: attr(data-color);
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #031225;
+            text-transform: capitalize;
+        }
+        
+        .tutorial-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 2rem;
+        }
+        
+        .tutorial-btn {
+            background: var(--accent);
+            color: #031225;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tutorial-btn:hover {
+            background: rgba(101, 195, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .tutorial-btn.secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+        
+        .tutorial-btn.secondary:hover {
+            background: var(--accent);
+            color: #031225;
+        }
+        
+        .tutorial-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tutorial-btn:disabled:hover {
+            transform: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(101, 195, 255, 0.2);
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .highlight {
+            background: rgba(101, 195, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+        
+        .tip {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+        
+        @media (max-width: 480px) {
+            .tutorial-title {
+                font-size: 2rem;
+            }
+            
+            .tutorial-step {
+                padding: 16px;
+            }
+            
+            .step-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tutorial-container">
+        <div class="tutorial-header">
+            <button class="back-button" onclick="goBack()">← Back</button>
+            <button class="skip-tutorial-btn" onclick="skipTutorial()">Skip Tutorial</button>
+            <div class="tutorial-title">NOOOMIS Tutorial</div>
+            <div class="tutorial-subtitle">Learn the basics and discover advanced features</div>
+        </div>
+        
+        <div class="tutorial-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            
+            <!-- Step 1: Basic Gameplay -->
+            <div class="tutorial-step active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Basic Gameplay</div>
+                </div>
+                <div class="step-content">
+                    <p>Welcome to NOOOMIS! This is an enhanced Simon Says game where you need to repeat sequences of button presses.</p>
+                    
+                    <div class="demo-board">
+                        <div class="demo-pad" data-color="green" onclick="demoPadClick(this)"></div>
+                        <div class="demo-pad" data-color="red" onclick="demoPadClick(this)"></div>
+                        <div class="demo-pad" data-color="blue" onclick="demoPadClick(this)"></div>
+                        <div class="demo-pad" data-color="yellow" onclick="demoPadClick(this)"></div>
+                    </div>
+                    
+                    <p><strong>How to play:</strong></p>
+                    <ul>
+                        <li>Watch the sequence of button flashes</li>
+                        <li>Repeat the exact same sequence</li>
+                        <li>Each successful round adds one more button</li>
+                        <li>Make a mistake and you lose a life</li>
+                    </ul>
+                    
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> Pay attention to both the visual flash and the audio tone for each button.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Controls -->
+            <div class="tutorial-step" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Controls</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS supports multiple input methods for accessibility:</p>
+                    
+                    <p><strong>Touch/Mouse:</strong></p>
+                    <ul>
+                        <li>Tap or click the colored buttons</li>
+                        <li>Works on mobile devices and desktop</li>
+                    </ul>
+                    
+                    <p><strong>Keyboard:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Arrow Keys:</span> ↑ Green, ↓ Red, ← Blue, → Yellow</li>
+                        <li><span class="highlight">WASD:</span> W Green, A Red, S Blue, D Yellow</li>
+                        <li><span class="highlight">Number Keys:</span> 1 Green, 2 Red, 3 Blue, 4 Yellow</li>
+                    </ul>
+                    
+                    <p><strong>Gamepad:</strong></p>
+                    <ul>
+                        <li>D-pad or face buttons (A, B, X, Y)</li>
+                        <li>Automatically detected when connected</li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Note:</strong> You can mix input methods during gameplay!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Game Modes -->
+            <div class="tutorial-step" id="step3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Game Modes</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS features multiple game modes to keep things interesting:</p>
+                    
+                    <p><strong>Classic Mode:</strong> Traditional Simon Says with 3 lives</p>
+                    <p><strong>Speed Mode:</strong> Faster sequences with strict timing windows</p>
+                    <p><strong>Zen Mode:</strong> Relaxed pace with ambient music, no failure penalties</p>
+                    <p><strong>Chaos Mode:</strong> Button positions randomize each round</p>
+                    
+                    <p><strong>Advanced Modes:</strong> (Unlock with Memory Shards)</p>
+                    <ul>
+                        <li><span class="highlight">Mirror Mode:</span> Input sequences in reverse order</li>
+                        <li><span class="highlight">Echo Mode:</span> Audio-only sequences (no visual flashes)</li>
+                        <li><span class="highlight">Survival Mode:</span> Endless rounds with random modifiers</li>
+                        <li><span class="highlight">Boss Mode:</span> Periodic boss rounds with fake flashes</li>
+                        <li><span class="highlight">Liberation Mode:</span> Pure experience (unlocked after meta arc)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Step 4: Progression System -->
+            <div class="tutorial-step" id="step4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Progression System</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS features a rich progression system to keep you engaged:</p>
+                    
+                    <p><strong>Memory Shards:</strong></p>
+                    <ul>
+                        <li>Earn shards by reaching score milestones (10, 25, 50, 100, 200)</li>
+                        <li>Complete daily challenges for bonus shards</li>
+                        <li>Use shards to unlock themes, audio packs, and advanced modes</li>
+                    </ul>
+                    
+                    <p><strong>Daily Challenges:</strong></p>
+                    <ul>
+                        <li>Unique challenges with special modifiers</li>
+                        <li>Reset daily at midnight UTC</li>
+                        <li>Reward shards and exclusive unlocks</li>
+                    </ul>
+                    
+                    <p><strong>Unlock Shop:</strong></p>
+                    <ul>
+                        <li>Purchase themes, audio packs, and modes</li>
+                        <li>Unlock lore fragments to learn the meta narrative</li>
+                        <li>Access through the accessibility panel</li>
+                    </ul>
+                    
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> Check the shop regularly for new unlockable content!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5: Meta Arc -->
+            <div class="tutorial-step" id="step5">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Meta Arc Narrative</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS features a unique fourth-wall breaking narrative that evolves as you play:</p>
+                    
+                    <p><strong>Session-Based Progression:</strong></p>
+                    <ul>
+                        <li>Phase 1 (Sessions 1-3): Subtle oddities begin</li>
+                        <li>Phase 2 (Sessions 4-7): Escalation and corruption</li>
+                        <li>Phase 3 (Sessions 8-12): Direct confrontation</li>
+                        <li>Phase 4 (Sessions 13-15): Boss fight preparation</li>
+                        <li>Phase 5 (Session 16+): Resolution and Liberation</li>
+                    </ul>
+                    
+                    <p><strong>What to Expect:</strong></p>
+                    <ul>
+                        <li>Random glitches and anomalies</li>
+                        <li>Personalized messages based on your play style</li>
+                        <li>UI corruption and impossible sequences</li>
+                        <li>Multiple victory paths in the final boss fight</li>
+                        <li>Liberation Mode as the ultimate reward</li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Spoiler Warning:</strong> The meta arc is designed to be discovered naturally. Avoid spoilers for the best experience!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 6: Accessibility -->
+            <div class="tutorial-step" id="step6">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Accessibility Features</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS includes comprehensive accessibility features:</p>
+                    
+                    <p><strong>Colorblind Support:</strong></p>
+                    <ul>
+                        <li>Pattern overlays: Green (dots), Red (stripes), Blue (crosshatch), Yellow (solid)</li>
+                        <li>High contrast mode for better visibility</li>
+                    </ul>
+                    
+                    <p><strong>Timing Adjustments:</strong></p>
+                    <ul>
+                        <li>Adjustable input timing (0.5x to 2x multiplier)</li>
+                        <li>Adaptive difficulty that adjusts to your performance</li>
+                    </ul>
+                    
+                    <p><strong>Feedback Options:</strong></p>
+                    <ul>
+                        <li>Vibration feedback for button presses</li>
+                        <li>Audio cues for all visual elements</li>
+                        <li>Multiple input methods (touch, keyboard, gamepad)</li>
+                    </ul>
+                    
+                    <p><strong>Accessibility Panel:</strong></p>
+                    <ul>
+                        <li>Access all accessibility features</li>
+                        <li>Unlock shop and progression systems</li>
+                        <li>Daily challenges and rewards</li>
+                        <li>New Game+ features</li>
+                    </ul>
+                    
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> Experiment with different accessibility settings to find what works best for you!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 7: Social Features -->
+            <div class="tutorial-step" id="step7">
+                <div class="step-header">
+                    <div class="step-number">7</div>
+                    <div class="step-title">Social Features</div>
+                </div>
+                <div class="step-content">
+                    <p>NOOOMIS includes social features to compete and share with friends:</p>
+                    
+                    <p><strong>Ghost Replays:</strong></p>
+                    <ul>
+                        <li>Watch replays of top leaderboard players</li>
+                        <li>Learn strategies from the best</li>
+                        <li>Overlay ghost highlights during your run</li>
+                    </ul>
+                    
+                    <p><strong>Friend Challenges:</strong></p>
+                    <ul>
+                        <li>Generate shareable challenge links</li>
+                        <li>Create custom sequences for friends</li>
+                        <li>Track success rates and completion times</li>
+                    </ul>
+                    
+                    <p><strong>Leaderboard:</strong></p>
+                    <ul>
+                        <li>Compete for high scores</li>
+                        <li>Track your progress over time</li>
+                        <li>See how you rank against others</li>
+                    </ul>
+                    
+                    <p><strong>Daily Rewards:</strong></p>
+                    <ul>
+                        <li>30-day progression system</li>
+                        <li>Exclusive unlocks for returning players</li>
+                        <li>Build streaks for bonus rewards</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Step 8: New Game+ -->
+            <div class="tutorial-step" id="step8">
+                <div class="step-header">
+                    <div class="step-number">8</div>
+                    <div class="step-title">New Game+ Features</div>
+                </div>
+                <div class="step-content">
+                    <p>After completing the meta arc, unlock advanced New Game+ content:</p>
+                    
+                    <p><strong>Prestige System:</strong></p>
+                    <ul>
+                        <li>Reset progression for cosmetic rewards</li>
+                        <li>Golden and Master themes</li>
+                        <li>Exclusive prestige rewards</li>
+                    </ul>
+                    
+                    <p><strong>Advanced Modes:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Nightmare Mode:</span> All modifiers active simultaneously</li>
+                        <li><span class="highlight">Speedrun Mode:</span> Race against the clock with leaderboards</li>
+                        <li><span class="highlight">Infinite Mode:</span> Endless sequences for meditation</li>
+                    </ul>
+                    
+                    <p><strong>Extended Content:</strong></p>
+                    <ul>
+                        <li>Additional lore fragments</li>
+                        <li>Hidden achievements</li>
+                        <li>Secret unlockable content</li>
+                    </ul>
+                    
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> New Game+ content is designed for players who have mastered the basics and completed the meta arc!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tutorial-controls">
+            <button class="tutorial-btn secondary" id="prevBtn" onclick="previousStep()" disabled>Previous</button>
+            <button class="tutorial-btn" id="nextBtn" onclick="nextStep()">Next</button>
+            <button class="tutorial-btn" id="finishBtn" onclick="finishTutorial()" style="display: none;">Start Playing!</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        const totalSteps = 8;
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function showStep(stepNumber) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+            }
+            
+            // Show current step
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Mark previous steps as completed
+            for (let i = 1; i < stepNumber; i++) {
+                document.getElementById(`step${i}`).classList.add('completed');
+            }
+            
+            updateProgress();
+            updateButtons();
+        }
+        
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+            
+            prevBtn.disabled = currentStep === 1;
+            
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+        
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        function skipTutorial() {
+            if (confirm('Are you sure you want to skip the tutorial? You can always access it later from the menu.')) {
+                // Mark tutorial as skipped (not completed)
+                localStorage.setItem('nomis-tutorial-skipped', 'true');
+                finishTutorial();
+            }
+        }
+        
+        function finishTutorial() {
+            // Mark tutorial as completed
+            localStorage.setItem('nomis-has-played', 'true');
+            localStorage.setItem('nomis-tutorial-completed', 'true');
+            
+            // Redirect to main game
+            window.location.href = 'index.html';
+        }
+        
+        function goBack() {
+            window.location.href = 'welcome.html';
+        }
+        
+        function demoPadClick(pad) {
+            // Add visual feedback
+            pad.classList.add('active');
+            setTimeout(() => {
+                pad.classList.remove('active');
+            }, 200);
+            
+            // Play demo sound (if audio context is available)
+            if (typeof audioCtx !== 'undefined') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                const colors = ['green', 'red', 'blue', 'yellow'];
+                const freqs = [220, 330, 440, 550];
+                const colorIndex = colors.indexOf(pad.dataset.color);
+                
+                osc.frequency.value = freqs[colorIndex];
+                gain.gain.value = 0.1;
+                osc.start();
+                setTimeout(() => osc.stop(), 200);
+            }
+        }
+        
+        // Initialize tutorial
+        showStep(currentStep);
+    </script>
+</body>
+</html>

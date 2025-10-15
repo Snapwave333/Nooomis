@@ -66,6 +66,12 @@ namespace UNISA.Core
             SetActive(settingsRoot, state == GameState.Settings);
             SetActive(creditsRoot, state == GameState.Credits);
             SetActive(hudRoot, state == GameState.GameCore);
+            
+            // Ensure settings UI is properly hidden when not in settings state
+            if (state != GameState.Settings && settingsRoot != null)
+            {
+                settingsRoot.SetActive(false);
+            }
         }
 
         private void SetActive(GameObject go, bool active)

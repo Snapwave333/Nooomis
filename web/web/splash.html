@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOOOMIS - Loading...</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #65C3FF, transparent),
+                radial-gradient(2px 2px at 40px 70px, #FF6B6B, transparent),
+                radial-gradient(1px 1px at 90px 40px, #4ECDC4, transparent),
+                radial-gradient(1px 1px at 130px 80px, #FFE66D, transparent),
+                radial-gradient(2px 2px at 160px 30px, #65C3FF, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: twinkle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(101, 195, 255, 0.1) 0%, transparent 70%);
+            animation: nebulaPulse 6s ease-in-out infinite;
+        }
+
+        @keyframes nebulaPulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+
+        .splash-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .splash-logo {
+            width: 300px;
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(101, 195, 255, 0.8));
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { 
+                filter: drop-shadow(0 0 20px rgba(101, 195, 255, 0.8));
+                transform: scale(1);
+            }
+            100% { 
+                filter: drop-shadow(0 0 40px rgba(101, 195, 255, 1));
+                transform: scale(1.05);
+            }
+        }
+
+        .logo-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px;
+            height: 350px;
+            border: 2px solid rgba(101, 195, 255, 0.3);
+            border-radius: 50%;
+            animation: ringRotate 10s linear infinite;
+        }
+
+        .logo-ring::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 50%;
+            animation: ringRotate 15s linear infinite reverse;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .loading-container {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .loading-text {
+            color: #65C3FF;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(101, 195, 255, 0.5);
+            animation: textPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .loading-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(26, 42, 74, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #65C3FF, #FF6B6B, #4ECDC4, #FFE66D);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            width: 0%;
+            animation: fillBar 4s ease-out forwards, barShimmer 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(101, 195, 255, 0.6);
+        }
+
+        @keyframes fillBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes barShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .loading-percentage {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            color: #65C3FF;
+            font-size: 0.9rem;
+            text-shadow: 0 0 5px rgba(101, 195, 255, 0.5);
+        }
+
+        .version-info {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(101, 195, 255, 0.6);
+            font-size: 0.8rem;
+            text-shadow: 0 0 5px rgba(101, 195, 255, 0.3);
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(101, 195, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: particleFloat 8s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .energy-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(101, 195, 255, 0.3);
+            border-radius: 50%;
+            animation: waveExpand 4s ease-out infinite;
+        }
+
+        .wave:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .wave:nth-child(2) { top: 60%; right: 15%; animation-delay: 1s; }
+        .wave:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 2s; }
+
+        @keyframes waveExpand {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .splash-logo {
+                width: 250px;
+            }
+            
+            .logo-ring {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .loading-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="nebula"></div>
+    
+    <div class="particles" id="particles"></div>
+    <div class="energy-waves">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="splash-container">
+        <div class="logo-container">
+            <div class="logo-ring"></div>
+            <img src="assets/nomis-logo.svg" alt="NOOOMIS Logo" class="splash-logo">
+        </div>
+        
+        <div class="loading-container">
+            <div class="loading-text">INITIALIZING NOOOMIS...</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+                <div class="loading-percentage" id="loadingPercent">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="version-info">v2.0 Enhanced • Meta Arc • New Game+</div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random size
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Loading progress simulation
+        function updateLoadingProgress() {
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingPercent = document.getElementById('loadingPercent');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                
+                loadingBar.style.width = progress + '%';
+                loadingPercent.textContent = Math.round(progress) + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        window.location.href = 'welcome.html';
+                    }, 500);
+                }
+            }, 200);
+        }
+
+        // Initialize splash screen
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateLoadingProgress();
+        });
+    </script>
+</body>
+</html>

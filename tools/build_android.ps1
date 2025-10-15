@@ -6,8 +6,8 @@ function Write-Warn($msg) { Write-Host "[WARN] $msg" -ForegroundColor Yellow }
 function Write-Err($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
 
 $workspace = "c:\Users\chrom\OneDrive\Desktop\apps\games\simon"
-$webSrc = Join-Path $workspace 'web'
-if (-not (Test-Path $webSrc)) { throw "Web source folder not found at $webSrc" }
+$webSrc = Join-Path $workspace 'web-react\dist'
+if (-not (Test-Path $webSrc)) { throw "React build folder not found at $webSrc" }
 
 Write-Info "Checking tooling (Node, npm, Java)..."
 try { node -v | Out-Null } catch { throw "Node.js not found. Install Node first." }
@@ -91,9 +91,13 @@ if (-not (Test-Path (Join-Path "$env:USERPROFILE\.android\avd" "$avdName.avd")))
 
 Write-Info "Preparing Cordova project..."
 $projDir = Join-Path $env:TEMP 'nomis-cordova'
-$apkPath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\debug\app-debug.apk'
+$apkDebugPath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\debug\app-debug.apk'
+$apkReleasePath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\release\app-release.apk'
+$aabReleasePath = Join-Path $projDir 'platforms\android\app\build\outputs\bundle\release\app-release.aab'
+$distDir = Join-Path $workspace 'dist\android'
+$releaseRequested = ($env:NOMIS_RELEASE -eq '1')
 $needBuild = $true
-if ($fastRelaunch -and (Test-Path $apkPath)) {
+if ($fastRelaunch -and (Test-Path $apkDebugPath)) {
   Write-Info "Fast relaunch requested and existing APK found. Skipping rebuild."
   $needBuild = $false
 }
@@ -101,7 +105,7 @@ elseif ($fastRelaunch) {
   $existing = Find-ExistingApk
   if ($existing -ne $null) {
     $projDir = $existing.ProjDir
-    $apkPath = $existing.ApkPath
+    $apkDebugPath = $existing.ApkPath
     Write-Info "Fast relaunch found APK at $apkPath"
     $needBuild = $false
   }
@@ -129,9 +133,10 @@ if ($needBuild) {
   $topBuild = Join-Path $projDir 'platforms\android\build.gradle'
   $settingsBuild = Join-Path $projDir 'platforms\android\app\build.gradle'
   $wrapperProps = Join-Path $projDir 'platforms\android\gradle\wrapper\gradle-wrapper.properties'
+  $gradleProps = Join-Path $projDir 'platforms\android\gradle.properties'
   if (Test-Path $topBuild) {
     $tb = Get-Content $topBuild -Raw
-    $tb = $tb -replace "classpath\s+['\"]com\.android\.tools\.build:gradle:[^'\"]+['\"]", "classpath 'com.android.tools.build:gradle:8.1.2'"
+    $tb = $tb -replace "classpath\s+['\`"]com\.android\.tools\.build:gradle:[^'\`"]+['\`"]", "classpath 'com.android.tools.build:gradle:8.1.2'"
     Set-Content $topBuild $tb
   }
   if (Test-Path $settingsBuild) {
@@ -140,26 +145,80 @@ if ($needBuild) {
   if (Test-Path $wrapperProps) {
     (Get-Content $wrapperProps) -replace 'distributionUrl=.*', 'distributionUrl=https\://services.gradle.org/distributions/gradle-8.1-bin.zip' | Set-Content $wrapperProps
   }
+  # Suppress AGP warning for compileSdk 35 with AGP 8.1.2
+  $suppression = 'android.suppressUnsupportedCompileSdk=35'
+  if (Test-Path $gradleProps) {
+    $gp = Get-Content $gradleProps -Raw
+    if ($gp -notmatch [regex]::Escape($suppression)) {
+      # Ensure we append with a newline to avoid concatenating onto the previous property
+      $needsNl = ($gp -notmatch "(`r`n|\n)$")
+      if ($needsNl) { $toAppend = "`r`n" + $suppression + "`r`n" } else { $toAppend = $suppression + "`r`n" }
+      Add-Content -Path $gradleProps -Value $toAppend
+    }
+    # Sanitize any literal backtick-newline sequences accidentally introduced by prior runs
+    $gpFixed = Get-Content $gradleProps -Raw
+    $gpFixed = $gpFixed -replace '`r`n', "`r`n"
+    # Normalize AndroidX/Jetifier booleans to plain true/false (no quoting)
+    $lines = $gpFixed -split "(`r`n|\n)"
+    $norm = foreach ($line in $lines) {
+      if ($line -match '^\s*android\.enableJetifier\s*=') { 'android.enableJetifier=true' }
+      elseif ($line -match '^\s*android\.useAndroidX\s*=') { 'android.useAndroidX=true' }
+      else { $line }
+    }
+    $gpFixed = ($norm -join "`r`n")
+    if ($gpFixed -notmatch "(`r`n|\n)$") { $gpFixed += "`r`n" }
+    Set-Content -Path $gradleProps -Value $gpFixed
+  } else {
+    # Create gradle.properties with proper newline termination
+    Set-Content -Path $gradleProps -Value ($suppression + "`r`n")
+  }
+
+  # Ensure signing keystore for release builds
+  function Ensure-UploadKeystore {
+    $keystoreDir = Join-Path $env:USERPROFILE '.nomis'
+    $keystorePath = Join-Path $keystoreDir 'upload.keystore'
+    New-Item -ItemType Directory -Force -Path $keystoreDir | Out-Null
+    if (-not (Test-Path $keystorePath)) {
+      Write-Info "Generating upload keystore..."
+      $storePass = $env:NOMIS_KEYSTORE_PASS; if (-not $storePass) { $storePass = 'nomis_upload' }
+      $alias = $env:NOMIS_KEY_ALIAS; if (-not $alias) { $alias = 'upload' }
+      $keyPass = $env:NOMIS_KEY_PASS; if (-not $keyPass) { $keyPass = $storePass }
+      $dname = $env:NOMIS_KEY_DNAME; if (-not $dname) { $dname = 'CN=Nomis,O=Nomis,L=Nomis,ST=Nomis,C=US' }
+      & keytool -genkeypair -v -keystore $keystorePath -storepass $storePass -keypass $keyPass -alias $alias -keyalg RSA -keysize 2048 -validity 3650 -dname $dname | Out-Null
+    }
+    return $keystorePath
+  }
+
+  $keystorePath = Ensure-UploadKeystore
+  $storePass = $env:NOMIS_KEYSTORE_PASS; if (-not $storePass) { $storePass = 'nomis_upload' }
+  $alias = $env:NOMIS_KEY_ALIAS; if (-not $alias) { $alias = 'upload' }
+  $keyPass = $env:NOMIS_KEY_PASS; if (-not $keyPass) { $keyPass = $storePass }
+  $buildCfg = Join-Path $projDir 'build.json'
+  $buildJson = @{
+    android = @{ release = @{ keystore = $keystorePath; storePassword = $storePass; alias = $alias; password = $keyPass; keystoreType = '' } }
+  } | ConvertTo-Json -Depth 4
+  Set-Content -Path $buildCfg -Value $buildJson -Encoding UTF8
 
   Write-Info "Copying web assets into Cordova www/ ..."
   $www = Join-Path $projDir 'www'
   if (Test-Path $www) { Remove-Item -Recurse -Force $www }
   New-Item -ItemType Directory -Force -Path $www | Out-Null
-  Get-ChildItem -Path $webSrc -Recurse | ForEach-Object {
-    $rootUri = New-Object System.Uri ($webSrc.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar)
-    $itemUri = New-Object System.Uri ($_.FullName)
-    $relUri = $rootUri.MakeRelativeUri($itemUri).ToString()
-    $relPath = $relUri -replace '/', [System.IO.Path]::DirectorySeparatorChar
-    $target = Join-Path $www $relPath
-    if ($_.PSIsContainer) {
-      New-Item -ItemType Directory -Force -Path $target | Out-Null
-    } else {
-      New-Item -ItemType Directory -Force -Path ([System.IO.Path]::GetDirectoryName($target)) | Out-Null
-      Copy-Item -Force -Path $_.FullName -Destination $target
-    }
+  
+  # Set React app as the entry point
+  Write-Info "Setting React app as entry point..."
+  $configXml = Join-Path $projDir 'config.xml'
+  if (Test-Path $configXml) {
+    $configContent = Get-Content $configXml -Raw
+    $configContent = $configContent -replace '<content src="index\.html" />', '<content src="index.html" />'
+    Set-Content $configXml $configContent
+    Write-Info "Updated config.xml to use React app as entry point"
+  } else {
+    Write-Warning "config.xml not found at $configXml"
   }
+  # Use simple recursive copy
+  Copy-Item -Path "$webSrc\*" -Destination $www -Recurse -Force
 
-Write-Info "Building Android APK (debug)..."
+Write-Info "Building Android artifacts..."
 # Install Gradle only if neither wrapper nor local Gradle is available
 function Ensure-Gradle {
   # Ensure a system Gradle for Cordova to generate wrapper if needed
@@ -184,9 +243,22 @@ function Ensure-Gradle {
   $env:Path = "$gradleHome\bin;$env:Path"
 }
   Ensure-Gradle
-  npx --yes cordova@latest build android --debug
-  if (-not (Test-Path $apkPath)) { throw "APK not found at $apkPath" }
-  Write-Info "APK built: $apkPath"
+  if ($releaseRequested) {
+    Write-Info "Building signed release APK..."
+    npx --yes cordova@latest build android --release --buildConfig=$buildCfg
+    if (-not (Test-Path $apkReleasePath)) { Write-Warn "Release APK not found at $apkReleasePath" } else { Write-Info "Release APK: $apkReleasePath" }
+    Write-Info "Building Play-ready AAB bundle..."
+    npx --yes cordova@latest build android --release -- --packageType=bundle --buildConfig=$buildCfg
+    if (-not (Test-Path $aabReleasePath)) { Write-Warn "Release AAB not found at $aabReleasePath" } else { Write-Info "Release AAB: $aabReleasePath" }
+    New-Item -ItemType Directory -Force -Path $distDir | Out-Null
+    if (Test-Path $apkReleasePath) { Copy-Item -Force $apkReleasePath (Join-Path $distDir 'app-release.apk') }
+    if (Test-Path $aabReleasePath) { Copy-Item -Force $aabReleasePath (Join-Path $distDir 'app-release.aab') }
+  } else {
+    Write-Info "Building debug APK..."
+    npx --yes cordova@latest build android --debug
+    if (-not (Test-Path $apkDebugPath)) { throw "APK not found at $apkDebugPath" }
+    Write-Info "APK built: $apkDebugPath"
+  }
 } else {
   # Ensure we are in project directory for any relative operations
   if (Test-Path $projDir) { Push-Location $projDir; $pushedProj = $true }
@@ -210,8 +282,10 @@ for ($i=0; $i -lt 120; $i++) {
 Write-Info "Uninstalling previous app (if any)..."
 try { & $adb uninstall com.nomis.simon | Out-Null } catch {}
 Write-Info "Installing APK to emulator..."
-& $adb install -r $apkPath | Write-Host
-& $adb install -r $apkPath
+$apkToInstall = $apkDebugPath
+if ($releaseRequested -and (Test-Path $apkReleasePath)) { $apkToInstall = $apkReleasePath }
+& $adb install -r $apkToInstall | Write-Host
+& $adb install -r $apkToInstall
 
 Write-Info "Launching app..."
 & $adb shell monkey -p com.nomis.simon -c android.intent.category.LAUNCHER 1 | Out-Null

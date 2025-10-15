@@ -1,0 +1,13 @@
+.speaker .logo { font-size: 12px; opacity: 0.9; letter-spacing: 0.3em; }
+.speaker .logo img { filter: drop-shadow(0 0 6px rgba(59,179,255,0.75)); animation: glowPulse 2.8s ease-in-out infinite; }
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(59,179,255,0.75)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255,59,59,0.85)); }
+}
+
+.timer { margin: 12px auto; width: 60%; height: 10px; background: #0a0f1f; border-radius: 999px; overflow: hidden; border: 1px solid #1c2540; }
+#timerBar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff3b3b, #ffd447); transition: width 0.1s linear; }
+
+/* Animated theme transitions */
+body { transition: background 0.4s ease, color 0.4s ease; }
+.board, .pad, .speaker, .hud, .leaderboard, .panel { transition: filter 0.3s ease, background 0.4s ease, box-shadow 0.4s ease; }

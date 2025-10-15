@@ -9,6 +9,7 @@ namespace UNISA.UIRuntime
         private Canvas canvas;
         private RectTransform root;
         private Text scoreText;
+        private bool isBuilt = false;
 
         private void Start()
         {
@@ -18,9 +19,22 @@ namespace UNISA.UIRuntime
             UpdateScore();
         }
 
+        private void OnDestroy()
+        {
+            // Clean up the canvas when this component is destroyed
+            if (canvas != null)
+            {
+                DestroyImmediate(canvas.gameObject);
+            }
+        }
+
         private void Build()
         {
+            // Prevent duplicate canvas creation
+            if (isBuilt) return;
+            
             canvas = new GameObject("GameOverCanvas").AddComponent<Canvas>();
+            isBuilt = true;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvas.gameObject.AddComponent<GraphicRaycaster>();
@@ -42,13 +56,39 @@ namespace UNISA.UIRuntime
             scoreText.rectTransform.anchorMin = new Vector2(0.5f, 0.7f); scoreText.rectTransform.anchorMax = new Vector2(0.5f, 0.7f);
             scoreText.rectTransform.sizeDelta = new Vector2(300, 50);
 
-            CreateAccentButton("Retry", new Vector2(0.45f, 0.55f), () => GameManager.Instance.StartGame());
-            CreateButton("Main Menu", new Vector2(0.55f, 0.55f), () => GameManager.Instance.SetState(GameState.MainMenu));
+            CreateAccentButton("Retry", new Vector2(0.40f, 0.55f), () => GameManager.Instance.StartGame());
+            CreateButton("Main Menu", new Vector2(0.52f, 0.55f), () => GameManager.Instance.SetState(GameState.MainMenu));
+            CreateButton("Share", new Vector2(0.64f, 0.55f), () => {
+                var score = GameManager.Instance.Score;
+                SocialShare.ShareText($"I scored {score} in NOMIS! Can you beat me?");
+            });
+
+            // Leaderboard list
+            var listGO = new GameObject("Leaderboard");
+            var listText = listGO.AddComponent<Text>();
+            listText.alignment = TextAnchor.UpperCenter; listText.color = Color.white; listText.fontSize = 18;
+            listText.rectTransform.SetParent(root, false);
+            listText.rectTransform.anchorMin = new Vector2(0.5f, 0.35f); listText.rectTransform.anchorMax = new Vector2(0.5f, 0.35f);
+            listText.rectTransform.sizeDelta = new Vector2(380, 160);
+            UpdateLeaderboard(listText);
         }
 
         private void UpdateScore()
         {
             scoreText.text = $"Score: {GameManager.Instance.Score}\nBest: {SaveSystem.Instance?.Data.bestScore ?? 0}";
+        }
+
+        private void UpdateLeaderboard(Text t)
+        {
+            var sb = GameObject.FindObjectOfType<Scoreboard>();
+            if (sb == null) { t.text = "No scores yet"; return; }
+            var lines = new System.Text.StringBuilder();
+            lines.AppendLine("Top Scores:");
+            for (int i = 0; i < sb.scores.Count; i++)
+            {
+                lines.AppendLine($"#{i+1}: {sb.scores[i]}");
+            }
+            t.text = lines.ToString();
         }
 
         private void CreateButton(string label, Vector2 anchor, UnityEngine.Events.UnityAction onClick)

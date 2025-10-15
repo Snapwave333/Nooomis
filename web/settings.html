@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOOOMIS — Settings</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .settings-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #031225 0%, #0a1a2e 50%, #16213e 100%);
+            color: var(--text);
+            padding: 20px;
+        }
+        
+        .settings-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .settings-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #65c3ff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .settings-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background: var(--accent);
+            color: #031225;
+        }
+        
+        .settings-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .settings-section {
+            background: var(--panel);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: rgba(101, 195, 255, 0.1);
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .section-header:hover {
+            background: rgba(101, 195, 255, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+        
+        .section-icon {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .section-toggle {
+            font-size: 1.2rem;
+            color: var(--accent);
+            transition: transform 0.2s;
+        }
+        
+        .settings-section.expanded .section-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .section-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .settings-section.expanded .section-content {
+            padding: 20px;
+            max-height: 1000px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(101, 195, 255, 0.2);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            flex: 1;
+        }
+        
+        .setting-label h4 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        
+        .setting-label p {
+            margin: 0;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .setting-control {
+            margin-left: 16px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #666;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .slider {
+            width: 100px;
+            height: 24px;
+            background: #666;
+            border-radius: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .select {
+            background: var(--panel);
+            border: 2px solid var(--accent);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        
+        .select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        
+        .button {
+            background: var(--accent);
+            color: #031225;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            background: rgba(101, 195, 255, 0.9);
+            transform: translateY(-1px);
+        }
+        
+        .button.secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+        
+        .button.secondary:hover {
+            background: var(--accent);
+            color: #031225;
+        }
+        
+        .button.danger {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .button.danger:hover {
+            background: #ff5252;
+        }
+        
+        .settings-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 2rem;
+        }
+        
+        .preview-area {
+            background: rgba(101, 195, 255, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        
+        .preview-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        
+        .preview-pad {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-pad:hover {
+            transform: scale(1.05);
+        }
+        
+        .preview-pad[data-color="green"] { background: #4ecdc4; }
+        .preview-pad[data-color="red"] { background: #ff6b6b; }
+        .preview-pad[data-color="blue"] { background: #65c3ff; }
+        .preview-pad[data-color="yellow"] { background: #ffe66d; }
+        
+        .preview-pad.colorblind[data-color="green"]::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, white 2px, transparent 2px);
+            background-size: 4px 4px;
+        }
+        
+        .preview-pad.colorblind[data-color="red"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(45deg, white 0px, white 2px, transparent 2px, transparent 4px);
+        }
+        
+        .preview-pad.colorblind[data-color="blue"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(90deg, white 0px, white 2px, transparent 2px, transparent 4px),
+                        repeating-linear-gradient(0deg, white 0px, white 2px, transparent 2px, transparent 4px);
+        }
+        
+        .preview-pad.colorblind[data-color="yellow"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            opacity: 0.3;
+        }
+        
+        .preview-pad {
+            position: relative;
+        }
+        
+        .preview-pad::before {
+            pointer-events: none;
+        }
+        
+        .reset-confirmation {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            display: none;
+        }
+        
+        .reset-confirmation.show {
+            display: block;
+        }
+        
+        .reset-confirmation p {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .reset-confirmation .button {
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .settings-title {
+                font-size: 2rem;
+            }
+            
+            .settings-section {
+                padding: 16px;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .setting-control {
+                margin-left: 0;
+                align-self: flex-end;
+            }
+        }
+    </style>
+  </head>
+  <body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <button class="back-button" onclick="goBack()">← Back</button>
+            <div class="settings-title">Settings</div>
+            <div class="settings-subtitle">Customize your NOOOMIS experience</div>
+        </div>
+        
+        <div class="settings-content">
+            <!-- Audio Settings -->
+            <div class="settings-section expanded" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">🔊</span>
+                        Audio Settings
+                    </div>
+                    <div class="section-toggle">▼</div>
+                </div>
+                <div class="section-content">
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Master Volume</h4>
+                        <p>Control overall game volume</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="slider" id="masterVolume" min="0" max="100" value="80">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>SFX Volume</h4>
+                        <p>Sound effects volume</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="slider" id="sfxVolume" min="0" max="100" value="80">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Music Volume</h4>
+                        <p>Background music volume</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="slider" id="musicVolume" min="0" max="100" value="60">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Audio Pack</h4>
+                        <p>Choose your preferred sound pack</p>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select" id="audioPack">
+                            <option value="classic">Classic</option>
+                            <option value="synth">Synth</option>
+                            <option value="soft">Soft</option>
+                        </select>
+                    </div>
+                </div>
+                </div>
+            </div>
+            
+            <!-- Visual Settings -->
+            <div class="settings-section" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">🎨</span>
+                        Visual Settings
+                    </div>
+                    <div class="section-toggle">▼</div>
+                </div>
+                <div class="section-content">
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Theme</h4>
+                        <p>Choose your visual theme</p>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select" id="theme">
+            <option value="neon">Neon</option>
+            <option value="grid">Grid</option>
+            <option value="mono">Mono</option>
+          </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Colorblind Mode</h4>
+                        <p>Add patterns for colorblind accessibility</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="colorblindToggle" onclick="toggleColorblind()"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>High Contrast</h4>
+                        <p>Increase contrast for better visibility</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="highContrastToggle" onclick="toggleHighContrast()"></div>
+                    </div>
+                </div>
+                
+                <div class="preview-area">
+                    <div class="preview-board" id="previewBoard">
+                        <div class="preview-pad" data-color="green" onclick="previewPadClick(this)"></div>
+                        <div class="preview-pad" data-color="red" onclick="previewPadClick(this)"></div>
+                        <div class="preview-pad" data-color="blue" onclick="previewPadClick(this)"></div>
+                        <div class="preview-pad" data-color="yellow" onclick="previewPadClick(this)"></div>
+                    </div>
+                    <p style="margin: 8px 0 0 0; font-size: 0.8rem; opacity: 0.7;">Preview</p>
+                </div>
+                </div>
+            </div>
+            
+            <!-- Accessibility Settings -->
+            <div class="settings-section" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">♿</span>
+                        Accessibility Settings
+                    </div>
+                    <div class="section-toggle">▼</div>
+                </div>
+                <div class="section-content">
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Input Timing</h4>
+                        <p>Adjust timing windows for input</p>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select" id="timingMultiplier">
+                            <option value="0.5">0.5x (Slower)</option>
+                            <option value="0.75">0.75x</option>
+                            <option value="1.0">1.0x (Normal)</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2.0">2.0x (Faster)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Vibration Feedback</h4>
+                        <p>Haptic feedback for button presses</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="vibrationToggle" onclick="toggleVibration()"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Adaptive Difficulty</h4>
+                        <p>Automatically adjust difficulty based on performance</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="adaptiveDifficultyToggle" onclick="toggleAdaptiveDifficulty()"></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            
+            <!-- Game Settings -->
+            <div class="settings-section" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">🎮</span>
+                        Game Settings
+                    </div>
+                    <div class="section-toggle">▼</div>
+                </div>
+                <div class="section-content">
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Default Mode</h4>
+                        <p>Starting game mode</p>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select" id="defaultMode">
+            <option value="classic">Classic</option>
+                            <option value="speed">Speed</option>
+                            <option value="zen">Zen</option>
+                            <option value="chaos">Chaos</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Lives</h4>
+                        <p>Number of lives in Classic/Speed modes</p>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select" id="lives">
+                            <option value="1">1 Life</option>
+                            <option value="3">3 Lives</option>
+                            <option value="5">5 Lives</option>
+                            <option value="10">10 Lives</option>
+          </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Auto-Save</h4>
+                        <p>Automatically save progress</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" id="autoSaveToggle" onclick="toggleAutoSave()"></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            
+            <!-- Data Management -->
+            <div class="settings-section" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">💾</span>
+                        Data Management
+                    </div>
+                    <div class="section-toggle">▼</div>
+                </div>
+                <div class="section-content">
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Export Save Data</h4>
+                        <p>Download your save file for backup</p>
+                    </div>
+                    <div class="setting-control">
+                        <button class="button secondary" onclick="exportSave()">Export</button>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Import Save Data</h4>
+                        <p>Load a previously exported save file</p>
+                    </div>
+                    <div class="setting-control">
+                        <button class="button secondary" onclick="importSave()">Import</button>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <h4>Reset Game Data</h4>
+                        <p>Clear all progress and start fresh</p>
+                    </div>
+                    <div class="setting-control">
+                        <button class="button danger" onclick="showResetConfirmation()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="reset-confirmation" id="resetConfirmation">
+                    <p>Are you sure you want to reset all game data? This cannot be undone.</p>
+                    <button class="button danger" onclick="resetGame()">Yes, Reset</button>
+                    <button class="button secondary" onclick="hideResetConfirmation()">Cancel</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-actions">
+            <button class="button secondary" onclick="resetToDefaults()">Reset to Defaults</button>
+            <button class="button" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+
+    <script>
+        // Load settings from localStorage
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('nomis-settings') || '{}');
+            
+            // Audio settings
+            document.getElementById('masterVolume').value = settings.masterVolume || 80;
+            document.getElementById('sfxVolume').value = settings.sfxVolume || 80;
+            document.getElementById('musicVolume').value = settings.musicVolume || 60;
+            document.getElementById('audioPack').value = settings.audioPack || 'classic';
+            
+            // Visual settings
+            document.getElementById('theme').value = settings.theme || 'neon';
+            updateToggle('colorblindToggle', settings.colorblindMode || false);
+            updateToggle('highContrastToggle', settings.highContrast || false);
+            
+            // Accessibility settings
+            document.getElementById('timingMultiplier').value = settings.timingMultiplier || '1.0';
+            updateToggle('vibrationToggle', settings.vibrationEnabled || false);
+            updateToggle('adaptiveDifficultyToggle', settings.adaptiveDifficulty || true);
+            
+            // Game settings
+            document.getElementById('defaultMode').value = settings.defaultMode || 'classic';
+            document.getElementById('lives').value = settings.lives || 3;
+            updateToggle('autoSaveToggle', settings.autoSave !== false);
+            
+            updatePreview();
+        }
+        
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = {
+                masterVolume: parseInt(document.getElementById('masterVolume').value),
+                sfxVolume: parseInt(document.getElementById('sfxVolume').value),
+                musicVolume: parseInt(document.getElementById('musicVolume').value),
+                audioPack: document.getElementById('audioPack').value,
+                theme: document.getElementById('theme').value,
+                colorblindMode: document.getElementById('colorblindToggle').classList.contains('active'),
+                highContrast: document.getElementById('highContrastToggle').classList.contains('active'),
+                timingMultiplier: document.getElementById('timingMultiplier').value,
+                vibrationEnabled: document.getElementById('vibrationToggle').classList.contains('active'),
+                adaptiveDifficulty: document.getElementById('adaptiveDifficultyToggle').classList.contains('active'),
+                defaultMode: document.getElementById('defaultMode').value,
+                lives: parseInt(document.getElementById('lives').value),
+                autoSave: document.getElementById('autoSaveToggle').classList.contains('active')
+            };
+            
+            localStorage.setItem('nomis-settings', JSON.stringify(settings));
+            alert('Settings saved successfully!');
+        }
+        
+        // Update toggle switch visual state
+        function updateToggle(toggleId, isActive) {
+            const toggle = document.getElementById(toggleId);
+            if (isActive) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+        }
+        
+        // Toggle functions
+        function toggleColorblind() {
+            const toggle = document.getElementById('colorblindToggle');
+            toggle.classList.toggle('active');
+            updatePreview();
+        }
+        
+        function toggleHighContrast() {
+            const toggle = document.getElementById('highContrastToggle');
+            toggle.classList.toggle('active');
+            updatePreview();
+        }
+        
+        function toggleVibration() {
+            const toggle = document.getElementById('vibrationToggle');
+            toggle.classList.toggle('active');
+        }
+        
+        function toggleAdaptiveDifficulty() {
+            const toggle = document.getElementById('adaptiveDifficultyToggle');
+            toggle.classList.toggle('active');
+        }
+        
+        function toggleAutoSave() {
+            const toggle = document.getElementById('autoSaveToggle');
+            toggle.classList.toggle('active');
+        }
+        
+        // Update preview board
+        function updatePreview() {
+            const previewBoard = document.getElementById('previewBoard');
+            const colorblindMode = document.getElementById('colorblindToggle').classList.contains('active');
+            const highContrast = document.getElementById('highContrastToggle').classList.contains('active');
+            
+            previewBoard.classList.toggle('colorblind', colorblindMode);
+            previewBoard.classList.toggle('high-contrast', highContrast);
+        }
+        
+        // Preview pad click
+        function previewPadClick(pad) {
+            pad.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                pad.style.transform = '';
+            }, 100);
+            
+            // Test vibration if enabled
+            if (document.getElementById('vibrationToggle').classList.contains('active') && navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // Data management functions
+        function exportSave() {
+            const saveData = localStorage.getItem('nomis-save');
+            if (saveData) {
+                const blob = new Blob([saveData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'nomis-save.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                alert('Save data exported successfully!');
+            } else {
+                alert('No save data found to export.');
+            }
+        }
+        
+        function importSave() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = e.target.result;
+                            localStorage.setItem('nomis-save', saveData);
+                            alert('Save data imported successfully!');
+                        } catch (error) {
+                            alert('Invalid save file format.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        function showResetConfirmation() {
+            document.getElementById('resetConfirmation').classList.add('show');
+        }
+        
+        function hideResetConfirmation() {
+            document.getElementById('resetConfirmation').classList.remove('show');
+        }
+        
+        function resetGame() {
+            localStorage.clear();
+            alert('Game data reset successfully!');
+            location.reload();
+        }
+        
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all settings to defaults?')) {
+                localStorage.removeItem('nomis-settings');
+                loadSettings();
+                alert('Settings reset to defaults!');
+            }
+        }
+        
+        function goBack() {
+            window.location.href = 'welcome.html';
+        }
+        
+        // Accordion functionality
+        function toggleSection(section) {
+            section.classList.toggle('expanded');
+        }
+        
+        // Initialize settings page
+        loadSettings();
+        
+        // Auto-save settings on change
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input, select')) {
+                if (document.getElementById('autoSaveToggle').classList.contains('active')) {
+                    saveSettings();
+                }
+            }
+        });
+    </script>
+  </body>
+  </html>

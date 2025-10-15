@@ -9,18 +9,33 @@ namespace UNISA.UIRuntime
         private Canvas canvas;
         private RectTransform root;
         private SettingsData current;
+        private bool isBuilt = false;
 
         private void Start()
         {
             current = SaveSystem.Instance?.Data.settings ?? new SettingsData();
             Build();
-            UIManager.Instance.settingsRoot = root.gameObject;
+            // Toggle the whole Settings canvas via UIManager to avoid overlay lingering
+            UIManager.Instance.settingsRoot = canvas.gameObject;
             UIManager.Instance.ShowMenu(GameManager.Instance.CurrentState);
+        }
+
+        private void OnDestroy()
+        {
+            // Clean up the canvas when this component is destroyed
+            if (canvas != null)
+            {
+                DestroyImmediate(canvas.gameObject);
+            }
         }
 
         private void Build()
         {
+            // Prevent duplicate canvas creation
+            if (isBuilt) return;
+            
             canvas = new GameObject("SettingsCanvas").AddComponent<Canvas>();
+            isBuilt = true;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvas.gameObject.AddComponent<GraphicRaycaster>();
