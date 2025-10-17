@@ -5,6 +5,7 @@ on:
     paths:
       - 'tools/build_android.ps1'
       - 'web/**'
+      - 'web-react/**'
 jobs:
   build-android:
     runs-on: windows-latest
@@ -14,6 +15,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+      - name: Install and build web-react
+        shell: pwsh
+        working-directory: web-react
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
       - name: Build Android
         shell: pwsh
         run: |

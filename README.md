@@ -1,224 +1,154 @@
-# NOOOMIS — Digital, Dazzling, Delightfully Chaotic
+# NOOOMIS — React Simon memory game (Web + Android + Windows)
 
 ![NOOOMIS Banner](branding/social-banner.svg)
 
-A modern, retro-futuristic Simon Says game with multiple gameplay modes, polished UI, and cross-platform support. Features both Unity C# implementation and a web prototype for rapid iteration.
+NOOOMIS is a modern take on the classic Simon memory game. The primary client is a React + TypeScript app (Vite) with polished UX, keyboard/touch support, and configurable audio. It ships with build tooling for Android (Cordova) and Windows (Electron), and includes legacy prototypes and Unity scripts for experimentation.
 
-## ✨ Features
+Looking for what changed recently? See CHANGELOG.md.
 
-### 🎮 Game Modes
-- **Classic Mode**: Traditional Simon Says gameplay
-- **Speed Mode**: Faster sequences with strict timing windows
-- **Zen Mode**: Relaxed pace with ambient music, no failure penalties
-- **Chaos Mode**: Button positions randomize each round
+## Highlights
 
-### 🎯 Core Gameplay
-- Four-color Simon Says sequence memory game
-- Progressive difficulty with increasing sequence length
-- Score tracking with best score persistence
-- Lives system (3 lives in Classic/Speed modes)
-- Real-time timer bar for Speed mode input windows
+- React app with pages for Welcome, Tutorial, Classic, Challenges, and Settings
+- Challenge modes: Speed Up (tempo increases) and Reverse (reverse playback and input)
+- GameShell top bar with Back, Pause/Resume, and a contextual mode label
+- Audio settings persisted: volume, mute, waveform, and selectable audio packs (Classic, Synth, Soft)
+- Works in Vite dev, static web build, and Cordova file-system environments (relative audio paths)
+- One-command builds for Android and Windows via PowerShell scripts
+- CI workflow builds Android package with up-to-date web-react assets
 
-### 🎨 UI & Experience
-- Clean, modern interface with neon theme
-- Settings overlay that properly hides during gameplay
-- Separate leaderboard page for high scores
-- Responsive design for mobile and desktop
-- Multiple audio packs (Classic, Synth, Soft)
-- Theme variations (Neon, Grid, Mono)
+## Project Structure
 
-### 📱 Platform Support
-- **Android**: Full APK build with emulator testing
-- **Web**: Browser-based prototype with WebAudio
-- **Unity**: C# scripts ready for Unity integration
-- **Cross-platform**: Touch, mouse, keyboard, and gamepad support
+- web-react/ — Primary React app (Vite + TS)
+- web/ — Legacy static prototype (kept for reference)
+- tools/ — Build scripts (Android, Windows, asset generators)
+- .github/workflows/ — CI for Android and web pages
+- branding/ — Logos and banner
+- Assets/ — Unity C# scripts (optional/legacy)
+- dist/ — Build outputs (Android AAB/APK, Windows artifacts, web bundles)
 
-## 📁 Project Structure
-- `Assets/` — Unity-ready C# scripts with complete game logic
-- `web/` — Browser prototype with full gameplay and UI
-- `tools/` — Build scripts for Android, Windows, and asset generation
-- `branding/` — Logos and social banner assets
+## Quick Start (React app)
 
-## 🚀 Quick Start
+1) Install and run
 
-### Web Demo
-1. Start a local server: `python -m http.server 5500`
-2. Open `http://localhost:5500/web/` in your browser
-3. Click "Start" to begin playing!
+```bash
+cd web-react
+npm ci
+npm run dev
+```
 
-### Android Build
-**Prerequisites**: Node.js 18+, Java JDK 17+, Android SDK commandline tools
+2) Open the app
+
+- Vite will print a local URL (typically http://localhost:5173/). Open it in your browser.
+
+3) Try the new pages
+
+- Tutorial: learn controls with a demo board and basic instructions
+- Challenges: pick Speed Up or Reverse, then start the game with those rules
+- Settings: adjust volume/mute/waveform and select an audio pack
+
+## Build & Distribution
+
+### Web build
+
+```bash
+cd web-react
+npm run build
+```
+
+Outputs to web-react/dist, which can be served as static assets.
+
+### Android (Cordova)
+
+Prerequisites: Node.js 18+, Java JDK 17+, Android SDK command-line tools.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/build_android.ps1
 ```
 
-This script will:
-- Install/update Android SDK components
-- Create a Cordova project
-- Build debug APK
-- Launch Android emulator
-- Install and run the game
+What the script does:
+- Builds web-react to produce fresh dist assets
+- Creates or refreshes a Cordova project in temp/nomis-cordova
+- Copies web-react/dist to Cordova www/
+- Builds and signs (debug) the Android package
+- Outputs to dist/android (AAB/APK)
 
-### Windows Installer
+### Windows (Electron)
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/build_installer.ps1
+powershell -ExecutionPolicy Bypass -File tools/build_windows.ps1
 ```
-Produces a local installed copy with desktop shortcut.
 
-## 🎮 Gameplay Controls
+What the script does:
+- Builds web-react to produce fresh dist assets
+- Packages the app using Electron
+- Outputs to dist/windows/electron and dist/windows/www
 
-### Input Methods
-- **Touch/Mouse**: Tap/click the colored buttons
-- **Keyboard**: Arrow keys, WASD, or number keys 1-4
-- **Gamepad**: A/B/X/Y buttons (Xbox/PlayStation mapping)
+## Audio Packs
 
-### Game Flow
-1. **Start**: Click "Start" → Select mode → Click "Begin"
-2. **Play**: Watch the sequence, then repeat it
-3. **Progress**: Each successful round adds one more step
-4. **Failure**: Lose a life (Classic/Speed) or restart sequence (Zen)
-5. **Game Over**: Submit your score to the leaderboard
+The React client loads sample-based packs using relative paths for compatibility with both Vite dev and Cordova file:// builds.
 
-## 🛠️ Unity Integration
+- Location: web-react/public/web/assets/audio/
+- Structure per pack:
 
-### Setup Steps
-1. Copy `Assets/` folder contents into your Unity project
-2. Create a scene with:
-   - `SimonGameManager` (core game logic)
-   - `AudioManager` (sound system)
-   - `UIManager` (UI management)
-   - Four `SimonButton` GameObjects with colliders
-3. Wire button events to `SimonGameManager.OnButtonPressed(color)`
-4. Configure GameMode via inspector or UI
+```
+web-react/public/web/assets/audio/<PackName>/
+  ├─ tone0.wav
+  ├─ tone1.wav
+  ├─ tone2.wav
+  └─ tone3.wav
+```
 
-### Key Components
-- **SimonGameManager**: Handles game state, sequences, scoring
-- **UIManager**: Manages UI overlays and state transitions
-- **AudioManager**: Sound effects and music
-- **SettingsManager**: User preferences and settings
-- **ThemeManager**: Visual theme management
+Notes:
+- Files should be short, mono WAV samples (44.1k/48kHz recommended)
+- Pack names are shown in Settings (e.g., Classic, Synth, Soft)
+- If you add a new pack, ensure all four toneX.wav files exist
 
-## 🎨 Customization
+## Controls
 
-### Audio Packs
-- **Classic**: Traditional Simon tones
-- **Synth**: Electronic synthesizer sounds
-- **Soft**: Gentle, ambient tones
-- Located in `web/assets/audio/` or Unity AudioClips
+- Mouse/Touch: tap/click the pads
+- Keyboard:
+  - 1, Q, ← for Green
+  - 2, W, ↑ for Red
+  - 3, E, ↓ for Blue
+  - 4, R, → for Yellow
 
-### Themes
-- **Neon**: Bright, futuristic colors
-- **Grid**: Minimalist grid pattern
-- **Mono**: Monochrome aesthetic
+## Settings & Persistence
 
-## 📋 Current Status
+- Volume and Mute
+- Waveform (oscillator type)
+- Audio Pack (sample set)
+- Preferences persist via localStorage and are applied on app start
 
-### ✅ Completed Features
-- [x] Core Simon Says gameplay with 4 modes
-- [x] Settings system with proper UI state management
-- [x] Leaderboard with score persistence
-- [x] Android APK build and emulator testing
-- [x] Web prototype with WebAudio
-- [x] Cross-platform input support
-- [x] Multiple audio packs and themes
-- [x] Responsive UI design
-- [x] Unity C# implementation
+## CI
 
-### 🚧 Roadmap
-- [ ] Signed Android release build for Play Store
-- [ ] iOS build and App Store submission
-- [ ] Steam integration with achievements
-- [ ] Enhanced visual effects and animations
-- [ ] Social sharing features
-- [ ] Cloud leaderboard synchronization
-- [ ] Additional game modes
-- [ ] Accessibility features
+- .github/workflows/android-apk.yml builds web-react and then packages the Android artifact
+- Triggers include changes under web-react/** so CI artifacts always include fresh assets
 
-## 🔧 Technical Details
+## Unity (optional/legacy)
 
-### Architecture
-- **Web**: Vanilla JavaScript with WebAudio API
-- **Unity**: C# scripts with modular component design
-- **Build**: Cordova for mobile, PowerShell scripts for automation
+Unity C# scripts live under Assets/ and can be integrated into a Unity project if desired. The actively developed, supported client is the React app in web-react/.
 
-### Audio System
-- **WebAudio**: Oscillator-based tones with fallback to sample files
-- **Unity**: AudioSource components with AudioClip support
-- **Packs**: Classic, Synth, and Soft audio variations
-- **Generation**: Stable Audio Open integration for custom tones
+## Contributing
 
-### UI System
-- **Web**: CSS3 with theme variables and responsive design
-- **Unity**: Canvas-based UI with proper state management
-- **Themes**: CSS custom properties for easy customization
-- **Accessibility**: ARIA labels and keyboard navigation
+We welcome contributions! See CONTRIBUTING.md.
 
-## 📱 Platform Support
+Suggested areas:
+- New challenge modes and difficulty curves
+- Visual polish and animations
+- Accessibility (reduced motion, colorblind modes, screen reader polish)
+- Performance profiling and bundle optimizations
+- Platform-specific integrations
 
-### Android
-- **Target**: Android API 34+ (Android 14+)
-- **Build**: Cordova with Gradle
-- **Architecture**: ARM64 optimized
-- **Permissions**: None required (offline game)
+## License
 
-### Web
-- **Browsers**: Chrome, Firefox, Safari, Edge
-- **Mobile**: Responsive design for touch devices
-- **Audio**: WebAudio API with graceful fallbacks
-- **Storage**: LocalStorage for settings and scores
+MIT License — see LICENSE.
 
-### Unity
-- **Version**: Unity 2022.3 LTS+
-- **Platforms**: Windows, macOS, Linux, Android, iOS
-- **Rendering**: Built-in and URP compatible
-- **Input**: Unity Input System ready
+## Troubleshooting
 
-## 🤝 Contributing
-
-We welcome contributions! Please see `CONTRIBUTING.md` for guidelines.
-
-### Development Setup
-1. Fork the repository
-2. Clone your fork locally
-3. Test changes in the web prototype first
-4. Update Unity scripts if needed
-5. Test Android build with `tools/build_android.ps1`
-6. Submit a pull request
-
-### Areas for Contribution
-- New game modes
-- Visual effects and animations
-- Audio improvements
-- Accessibility features
-- Platform-specific optimizations
-- Documentation improvements
-
-## 📄 License
-
-MIT License - see LICENSE file for details.
-
-### Third-Party Assets
-- Audio samples in `web/assets/audio/` are included under MIT license
-- Unity packages may have their own licenses
-- Branding assets are original work
-
-## 🎯 Recent Updates
-
-### Latest Changes
-- ✅ Fixed settings overlay persistence during gameplay
-- ✅ Moved leaderboard to separate page for cleaner UI
-- ✅ Reduced repetitive branding elements
-- ✅ Improved UI state management
-- ✅ Enhanced Android build process
-- ✅ Added comprehensive README documentation
-
-### Performance Optimizations
-- Proper canvas cleanup to prevent memory leaks
-- Efficient UI state transitions
-- Optimized audio playback
-- Responsive design improvements
+- No audio on Android: verify audio packs exist at web-react/public/web/assets/audio/<PackName>/tone0-3.wav
+- Missing assets after Android build: ensure the build script ran web-react build (tools/build_android.ps1 does this automatically)
+- Dev server unreachable: check the URL printed by Vite and ensure firewall rules allow localhost
 
 ---
 
-**NOOOMIS** — Where digital meets dazzling, and chaos becomes delightful! 🎮✨
+NOOOMIS — Where digital meets dazzling, and chaos becomes delightful! 🎮✨

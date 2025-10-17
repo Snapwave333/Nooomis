@@ -6,8 +6,15 @@ function Write-Warn($msg) { Write-Host "[WARN] $msg" -ForegroundColor Yellow }
 function Write-Err($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
 
 $workspace = "c:\Users\chrom\OneDrive\Desktop\apps\games\simon"
-$webSrc = Join-Path $workspace 'web-react\dist'
-if (-not (Test-Path $webSrc)) { throw "React build folder not found at $webSrc" }
+# Ensure the React app is built so dist/ exists for packaging
+$webReactDir = Join-Path $workspace 'web-react'
+$webSrc = Join-Path $webReactDir 'dist'
+
+
+# Use workspace temp directory instead of system temp for better permissions
+$cwd = Get-Location
+$tempDir = Join-Path $workspace 'temp'
+New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
 
 Write-Info "Checking tooling (Node, npm, Java)..."
 try { node -v | Out-Null } catch { throw "Node.js not found. Install Node first." }
@@ -22,9 +29,30 @@ $env:CI = 'true'
 $fastRelaunch = $env:NOMIS_FAST_RELAUNCH -eq '1'
 $pushedTemp = $false
 $pushedProj = $false
+$pushedWeb = $false
+
+Write-Info "Building React app (web-react) for Android packaging..."
+if (-not (Test-Path (Join-Path $webReactDir 'package.json'))) {
+  throw "Cannot find web-react project at $webReactDir"
+}
+Push-Location $webReactDir
+$pushedWeb = $true
+try {
+  # Prefer reproducible installs in CI, but fallback to npm install if lockfile missing
+  if (Test-Path (Join-Path $webReactDir 'package-lock.json')) {
+    npm ci --no-audit --no-fund | Out-Null
+  } else {
+    npm install --no-audit --no-fund | Out-Null
+  }
+  npm run build | Write-Host
+} finally {
+  if ($pushedWeb) { Pop-Location; $pushedWeb = $false }
+}
+
+if (-not (Test-Path $webSrc)) { throw "React build folder not found at $webSrc after build" }
 
 function Find-ExistingApk {
-  $pattern = Join-Path $env:TEMP 'nomis-cordova*'
+  $pattern = Join-Path $tempDir 'nomis-cordova*'
   $candidates = Get-ChildItem -Path $pattern -Directory -ErrorAction SilentlyContinue
   $found = @()
   foreach ($dir in $candidates) {
@@ -51,10 +79,10 @@ function Ensure-AndroidCmdlineTools {
   }
   Write-Info "Downloading Android Commandline Tools..."
   $zipUrl = 'https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip'
-  $zipPath = Join-Path $env:TEMP 'cmdline-tools.zip'
+  $zipPath = Join-Path $tempDir 'cmdline-tools.zip'
   Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
   Write-Info "Extracting cmdline-tools..."
-  $extractDir = Join-Path $env:TEMP 'cmdline-tools-extract'
+  $extractDir = Join-Path $tempDir 'cmdline-tools-extract'
   if (Test-Path $extractDir) { Remove-Item -Recurse -Force $extractDir }
   Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
   New-Item -ItemType Directory -Force -Path $cmdlineLatest | Out-Null
@@ -90,7 +118,7 @@ if (-not (Test-Path (Join-Path "$env:USERPROFILE\.android\avd" "$avdName.avd")))
 }
 
 Write-Info "Preparing Cordova project..."
-$projDir = Join-Path $env:TEMP 'nomis-cordova'
+$projDir = Join-Path $tempDir 'nomis-cordova'
 $apkDebugPath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\debug\app-debug.apk'
 $apkReleasePath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\release\app-release.apk'
 $aabReleasePath = Join-Path $projDir 'platforms\android\app\build\outputs\bundle\release\app-release.aab'
@@ -117,11 +145,11 @@ if ($needBuild) {
     try { Remove-Item -Recurse -Force -ErrorAction Stop $projDir }
     catch {
       Write-Warn "Failed to delete $projDir cleanly. Using a fresh temp directory."
-      $projDir = Join-Path $env:TEMP ("nomis-cordova-" + [Guid]::NewGuid().ToString("N").Substring(8))
+      $projDir = Join-Path $tempDir ("nomis-cordova-" + [Guid]::NewGuid().ToString("N").Substring(8))
       $apkPath = Join-Path $projDir 'platforms\android\app\build\outputs\apk\debug\app-debug.apk'
     }
   }
-  Push-Location $env:TEMP
+  Push-Location $tempDir
   $pushedTemp = $true
   $projName = Split-Path -Leaf $projDir
   npx --yes cordova@latest create $projName com.nomis.simon NOMIS
@@ -228,8 +256,8 @@ function Ensure-Gradle {
   }
   $gradleVersion = '8.13'
   $gradleZip = "https://services.gradle.org/distributions/gradle-$gradleVersion-bin.zip"
-  $zipPath = Join-Path $env:TEMP "gradle-$gradleVersion-bin.zip"
-  $gradleRoot = Join-Path $env:LOCALAPPDATA 'gradle'
+  $zipPath = Join-Path $tempDir "gradle-$gradleVersion-bin.zip"
+  $gradleRoot = Join-Path $workspace 'gradle'
   $gradleHome = Join-Path $gradleRoot "gradle-$gradleVersion"
   $gradleBat = Join-Path $gradleHome 'bin\gradle.bat'
   if (-not (Test-Path $gradleBat)) {

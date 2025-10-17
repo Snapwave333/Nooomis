@@ -4,6 +4,8 @@ interface SaveData {
     volume: number;
     theme: string;
     audioPack: string;
+    waveform?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    muted?: boolean;
     highContrast: boolean;
     reducedMotion: boolean;
   };
@@ -16,6 +18,8 @@ function getDefaultSave(): SaveData {
       volume: 0.7,
       theme: 'default',
       audioPack: 'classic',
+      waveform: 'sine',
+      muted: false,
       highContrast: false,
       reducedMotion: false,
     },

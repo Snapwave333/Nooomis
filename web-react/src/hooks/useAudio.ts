@@ -16,5 +16,35 @@ export function useAudio() {
     return audioManager.playPad(index, duration);
   }, [getAudioManager]);
   
-  return { playPad };
+  const setVolume = useCallback((vol: number) => {
+    const audioManager = getAudioManager();
+    audioManager.setVolume(vol);
+  }, [getAudioManager]);
+  
+  const setMuted = useCallback((muted: boolean) => {
+    const audioManager = getAudioManager();
+    audioManager.setMuted(muted);
+  }, [getAudioManager]);
+  
+  const setWaveform = useCallback((type: OscillatorType) => {
+    const audioManager = getAudioManager();
+    audioManager.setWaveform(type);
+  }, [getAudioManager]);
+
+  const setAudioPack = useCallback(async (pack: string) => {
+    const audioManager = getAudioManager();
+    await audioManager.setAudioPack(pack);
+  }, [getAudioManager]);
+
+  const startAmbient = useCallback(() => {
+    const audioManager = getAudioManager();
+    audioManager.startAmbientLoop();
+  }, [getAudioManager]);
+
+  const stopAmbient = useCallback(() => {
+    const audioManager = getAudioManager();
+    audioManager.stopAmbientLoop();
+  }, [getAudioManager]);
+
+  return { playPad, setVolume, setMuted, setWaveform, setAudioPack, startAmbient, stopAmbient };
 }

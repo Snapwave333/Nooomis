@@ -4,6 +4,14 @@ import { SequenceGenerator } from '../lib/sequence';
 import { calculateScore, CLASSIC_CONFIG } from '../lib/modes/classic';
 import { useAudio } from './useAudio';
 
+export type StartOptions = {
+  label?: string;
+  speedMultiplier?: number; // >1 plays faster
+  gapScale?: number; // <1 reduces gaps
+  reverse?: boolean; // input and playback reversed
+  startingLives?: number;
+};
+
 export function useGame() {
   const [state, setState] = useState<GameStateType>(GameState.IDLE);
   const [sequence, setSequence] = useState<number[]>([]);
@@ -17,6 +25,7 @@ export function useGame() {
   
   const sequenceGeneratorRef = useRef<SequenceGenerator | null>(null);
   const { playPad } = useAudio();
+  const startOptionsRef = useRef<StartOptions | null>(null);
   
   const getSequenceGenerator = useCallback(() => {
     if (!sequenceGeneratorRef.current) {
@@ -29,13 +38,19 @@ export function useGame() {
     setState(GameState.PLAYBACK);
     setAriaMessage(`Playing sequence of ${seq.length} notes`);
     
-    for (let i = 0; i < seq.length; i++) {
-      setActivePad(seq[i]);
-      await playPad(seq[i], CLASSIC_CONFIG.toneDuration);
+    const opts = startOptionsRef.current || {};
+    const toneMs = Math.max(60, CLASSIC_CONFIG.toneDuration / (opts.speedMultiplier || 1));
+    const gapMs = Math.max(30, CLASSIC_CONFIG.gapDuration * (opts.gapScale || 1));
+    const playbackSeq = opts.reverse ? [...seq].reverse() : seq;
+
+    for (let i = 0; i < playbackSeq.length; i++) {
+      const pad = playbackSeq[i];
+      setActivePad(pad);
+      await playPad(pad, toneMs);
       setActivePad(undefined);
       
-      if (i < seq.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, CLASSIC_CONFIG.gapDuration));
+      if (i < playbackSeq.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, gapMs));
       }
     }
     
@@ -43,13 +58,14 @@ export function useGame() {
     setAriaMessage('Your turn! Repeat the sequence');
   }, [playPad]);
   
-  const startGame = useCallback((_mode: string) => {
+  const startGame = useCallback((_mode: string, options?: StartOptions) => {
     const generator = getSequenceGenerator();
     const newSequence = generator.startNewGame();
     setSequence(newSequence);
     setPlayerInput([]);
     setScore(0);
-    setLives(CLASSIC_CONFIG.startingLives);
+    startOptionsRef.current = options || null;
+    setLives(options?.startingLives ?? CLASSIC_CONFIG.startingLives);
     setRound(1);
     setStreak(0);
     setAriaMessage('Starting new game');
@@ -67,7 +83,15 @@ export function useGame() {
     playPad(padIndex, CLASSIC_CONFIG.toneDuration);
     
     // Check correctness
-    const isCorrect = sequence[newInput.length - 1] === padIndex;
+    const opts = startOptionsRef.current || {};
+    let isCorrect: boolean;
+    if (opts.reverse) {
+      // Expect inputs in reverse order
+      const expected = sequence[sequence.length - newInput.length];
+      isCorrect = expected === padIndex;
+    } else {
+      isCorrect = sequence[newInput.length - 1] === padIndex;
+    }
     
     if (!isCorrect) {
       setState(GameState.ROUND_FAIL);
@@ -107,6 +131,20 @@ export function useGame() {
     }
   }, [state, playerInput, sequence, lives, score, round, streak, playPad, getSequenceGenerator, playSequence]);
   
+  const pause = useCallback(() => {
+    if (state === GameState.PLAYER_INPUT) {
+      setState(GameState.PAUSED);
+      setAriaMessage('Game paused');
+    }
+  }, [state]);
+  
+  const resume = useCallback(() => {
+    if (state === GameState.PAUSED) {
+      setState(GameState.PLAYER_INPUT);
+      setAriaMessage('Resumed');
+    }
+  }, [state]);
+  
   return {
     state,
     sequence,
@@ -118,5 +156,7 @@ export function useGame() {
     ariaMessage,
     startGame,
     handlePlayerPress,
+    pause,
+    resume,
   };
 }

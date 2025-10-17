@@ -27,6 +27,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Canvas cleanup to prevent memory leaks
 - Audio performance issues with preloading
 
+## [2.1.0] - 2025-10-17
+
+### Added
+- React app (web-react) pages: Tutorial and Challenges
+  - TutorialPage with interactive SimonBoard demo and basic instructions
+  - ChallengePage with initial variants: Speed Up and Reverse
+- GameShell top bar with Back, Pause, Resume controls and mode label
+- Game modifiers via StartOptions in useGame: speedMultiplier, gapScale, reverse, startingLives
+- Audio packs in the React app with sample-based playback and graceful oscillator fallback
+- Settings page option to select audio pack; persisted and applied at startup
+- Android build script now builds the React app and copies dist into Cordova www automatically
+- Android CI workflow updated to build web-react and trigger on web-react/** changes
+
+### Changed
+- Audio sample path switched to relative web/assets/audio for compatibility with Cordova file://
+- App wiring updated to pass mode labels and StartOptions to GameShell
+
+### Fixed
+- Audio pack loading under Cordova (file://) environments
+- Minor navigation polish for Tutorial/Challenges flows
+
 ## [2.0.0] - 2025-10-15
 
 ### Added
