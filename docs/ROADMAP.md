@@ -7,7 +7,7 @@ This roadmap reflects the current React client (web-react) as the primary app an
 - Challenges page with two modes: Speed Up and Reverse
 - GameShell top bar: Back, Pause/Resume, contextual mode label
 - StartOptions plumbed through useGame (tempo, reverse, lives)
-- Audio packs (Classic, Synth, Soft), persisted audio settings (volume, mute, waveform)
+- Persisted audio settings (volume, mute, waveform). React Settings page currently excludes Audio Pack selection; legacy/static builds may still reference packs.
 - Android build scripts and CI updated to always package fresh web-react assets
 - Relative audio paths for Cordova compatibility
 
@@ -24,6 +24,7 @@ UI/UX & Accessibility
 - Refine Back/Pause/Resume behavior and visual states in GameShell
 - Add focus outlines, improved keyboard help, and colorblind-friendly palettes
 - Respect reduced motion and add subtle animations for pad press/sequence playback
+- Evaluate native splash via tauri-plugin-splashscreen (optional); keep React overlay fallback
 
 Audio
 - Normalize pack levels; preload samples; improve fade ramps to avoid pops
@@ -37,6 +38,7 @@ Quality & Testing
 Build & Packaging
 - Signed Android release build and Play-ready bundle
 - Ensure Windows packaging uses latest web-react assets (already part of script) and consider CI for Windows
+- Dev server pinned to 5173 (strictPort=true); align Tauri devPath; pin Windows Tauri workflow tauri-cli to v1.6.0
 
 ## Mid-term (2.3+)
 

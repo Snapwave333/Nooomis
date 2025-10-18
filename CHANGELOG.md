@@ -3,29 +3,27 @@
 All notable changes to the NOOOMIS project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0/).
 
 ## [Unreleased]
 
+## [2.1.1-nightly] - 2025-10-18
+
 ### Added
-- Unity C# implementation with modular component design
-- Cross-platform input support (touch, mouse, keyboard, gamepad)
-- Multiple audio packs (Classic, Synth, Soft)
-- Theme variations (Neon, Grid, Mono)
-- Settings system with proper UI state management
-- Leaderboard with score persistence
-- Responsive design for mobile and desktop
+- Lightweight splash overlay in React app with dedicated Splash.css and accessibility attributes
+- Documented dev conventions: Vite dev server pinned to port 5173 with strictPort=true; Tauri devPath aligns
 
 ### Changed
-- Enhanced save system with progression tracking and unlock management
-- Improved UI state management and transitions
-- Optimized audio playback with oscillator pooling
-- Updated project structure with better organization
+- Settings page simplified in React app: removed Audio Pack selection and Logs Viewer sections; retained core audio and theme settings (volume, mute, waveform, theme)
+- Refactored Settings component naming to canonical SettingsPage; removed redundant SettingsPageSimple
 
 ### Fixed
-- Settings overlay persistence during gameplay
-- Canvas cleanup to prevent memory leaks
-- Audio performance issues with preloading
+- Prevent dev server port hopping by pinning port 5173; resolved stale Node process holding port
+- Import/props mismatch in App resolved; ensures Settings page renders correctly
+
+### Notes
+- Legacy static web (web/**) still references audio packs and remains unchanged
+- CI: Windows Tauri workflow pins tauri-cli to 1.6.0 with --locked to match Tauri v1.6
 
 ## [2.1.0] - 2025-10-17
 
