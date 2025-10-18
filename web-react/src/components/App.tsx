@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import { GameShell } from './GameShell';
 import { WelcomePage } from './WelcomePage';
 import { SettingsPage } from './SettingsPage';
+import { Splash } from './Splash';
 import { loadGame } from '../lib/storage';
 import { TutorialPage } from './TutorialPage';
 import { ChallengePage } from './ChallengePage';
@@ -15,7 +16,8 @@ function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
   const [modeLabel, setModeLabel] = useState<string>('Classic');
   const [startOptions, setStartOptions] = useState<StartOptions | undefined>(undefined);
-  const { setVolume, setMuted, setWaveform, setAudioPack } = useAudio();
+  const { setVolume, setMuted, setWaveform } = useAudio();
+  const [splashVisible, setSplashVisible] = useState(true);
 
   // Apply persisted theme (if any) on load
   useEffect(() => {
@@ -26,9 +28,21 @@ function App() {
       setVolume(data.settings.volume ?? 0.7);
       setMuted(!!data.settings.muted);
       setWaveform((data.settings.waveform || 'sine') as OscillatorType);
-      // Load preferred audio pack (falls back if samples are missing)
-      setAudioPack(data.settings.audioPack || 'classic');
     } catch {}
+  }, []);
+
+  // Hide splash when fonts are ready, or after a short delay as fallback
+  useEffect(() => {
+    let canceled = false;
+    const hide = () => { if (!canceled) setSplashVisible(false); };
+    const fontsReady = (document as any).fonts?.ready;
+    if (fontsReady && typeof fontsReady.then === 'function') {
+      fontsReady.then(hide);
+    } else {
+      window.addEventListener('load', hide, { once: true });
+    }
+    const timer = setTimeout(hide, 1200);
+    return () => { canceled = true; clearTimeout(timer); window.removeEventListener('load', hide); };
   }, []);
 
   const handleQuit = useCallback(() => {
@@ -44,6 +58,7 @@ function App() {
 
   return (
     <div className="App">
+      {splashVisible && <Splash />}
       {screen === 'welcome' && (
         <WelcomePage
           onStart={() => { setModeLabel('Classic'); setStartOptions(undefined); setScreen('game'); }}

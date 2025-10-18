@@ -1,0 +1,62 @@
+name: Windows Tauri Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src-tauri/**'
+      - 'web-react/**'
+      - 'tools/**'
+      - '.github/workflows/windows-tauri.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add MSVC target
+        run: rustup target add x86_64-pc-windows-msvc
+        shell: pwsh
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version 1.6.0 --locked
+        shell: pwsh
+
+      - name: Prepare embeddable Python and copy scripts
+        run: pwsh -File tools/setup_python_embed.ps1
+        shell: pwsh
+
+      - name: Install web-react dependencies
+        run: |
+          cd web-react
+          npm ci
+        shell: pwsh
+
+      - name: Build web-react
+        run: |
+          cd web-react
+          npm run build
+        shell: pwsh
+
+      - name: Build Tauri app (Windows)
+        run: cargo tauri build
+        shell: pwsh
+
+      - name: Upload Tauri artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows-artifacts
+          path: |
+            src-tauri/target/release/**
+            src-tauri/target/**/bundle/**

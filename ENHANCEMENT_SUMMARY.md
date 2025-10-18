@@ -1,5 +1,7 @@
 # NOMIS Enhancement Summary
 
+> Nightly 2025-10-18 (React client): simplified Settings (no Audio Pack selection, no Logs Viewer), added lightweight splash overlay, dev server pinned to 5173; Windows CI pins tauri-cli v1.6.0.
+
 ## 🎉 Complete Implementation Status
 
 All 7 phases of the NOMIS enhancement plan have been successfully implemented and deployed to Android.
@@ -248,12 +250,3 @@ NOMIS has been successfully transformed from a simple Simon Says game into a com
 - **Meta-arc narrative** with fourth-wall breaks
 - **Accessibility features** for inclusive gameplay
 - **New Game+ content** for extended replayability
-
-The game is now ready for production deployment and provides a rich, engaging experience that goes far beyond traditional memory games.
-
-**Total Implementation Time**: ~25 hours
-**Files Created/Modified**: 15+ JavaScript files, 3 CSS files, 2 HTML files, Unity C# scripts
-**Features Implemented**: 50+ individual features across 7 phases
-**Platforms Supported**: Web, Android, Unity (ready for port)
-
-The enhancement plan has been **100% completed** and successfully deployed! 🚀

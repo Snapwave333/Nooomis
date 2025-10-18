@@ -12,8 +12,8 @@ This is the primary web client used for development. It works in Vite dev, stati
   - Speed Up: tempo increases over rounds (shorter tone/gap)
   - Reverse: sequence plays reversed and requires reversed input
 - GameShell top bar with Back, Pause/Resume, and contextual mode label
-- Audio settings persisted (volume, mute, waveform, and audio packs)
-- Audio packs: Classic, Synth, Soft (sample-based) with relative asset paths for web and Cordova
+- Audio settings persisted (volume, mute, waveform)
+- Audio packs (legacy/static builds): Classic, Synth, Soft. The current React Settings page no longer includes audio pack selection.
 - Responsive controls for mouse, touch, and keyboard
 
 ## Quick Start
@@ -46,10 +46,12 @@ npm run preview # serve the production build locally
 - Welcome: entry point with navigation to Tutorial, Challenges, Classic, Settings
 - Tutorial: demo board to try tones and read quick instructions
 - Challenges: select Speed Up or Reverse; starts game with those rules
-- Settings: volume, mute, waveform, and audio pack selection
+- Settings: volume, mute, waveform
 - GameShell: top bar with Back, Pause/Resume, and a mode label (e.g., Classic, Speed Up)
 
-## Audio Packs
+## Audio Packs (legacy/optional)
+
+Note: The current React Settings page no longer includes audio pack selection; this section remains for legacy/static builds.
 
 The client can use sample-based audio packs in addition to oscillator tones. Packs are loaded via relative paths so they work in Vite dev, static web builds, and Cordova file:// environments.
 
@@ -73,7 +75,6 @@ Notes:
 
 - Volume and Mute
 - Waveform (oscillator type)
-- Audio Pack (sample set)
 - Preferences are saved in localStorage and applied on app start
 
 ## Architecture (high level)
@@ -81,7 +82,7 @@ Notes:
 - Components: modular React components in src/components
 - Hooks:
   - useGame: game state, sequence, lives, correctness, StartOptions support
-  - useAudio: AudioManager integration (volume, mute, waveform, audio packs)
+  - useAudio: AudioManager integration (volume, mute, waveform)
 - Storage: localStorage for user preferences
 - Build tooling: Vite + TypeScript
 
@@ -90,7 +91,7 @@ Developer note: Challenge rules are configured via StartOptions (see src/hooks/u
 ## Troubleshooting
 
 - No audio in dev: check browser autoplay policy; interact with the page first
-- No audio on Android: verify audio packs exist under public/web/assets/audio/<PackName>/tone0-3.wav
+- No audio on Android: ensure audio assets are packaged correctly. In legacy/static builds, verify packs under public/web/assets/audio/<PackName>/tone0-3.wav
 - Missing assets after packaging: re-run repository root build scripts to ensure web-react/dist is fresh
 
 ## License

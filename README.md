@@ -6,12 +6,18 @@ NOOOMIS is a modern take on the classic Simon memory game. The primary client is
 
 Looking for what changed recently? See CHANGELOG.md.
 
+Nightly 2025-10-18:
+- React client shows a lightweight splash overlay on start.
+- Settings page simplified (no Audio Pack selection, no Logs Viewer).
+- Dev server pinned to http://localhost:5173 (strictPort=true); Tauri devPath aligns.
+- Windows CI pins tauri-cli to v1.6.0.
+
 ## Highlights
 
 - React app with pages for Welcome, Tutorial, Classic, Challenges, and Settings
 - Challenge modes: Speed Up (tempo increases) and Reverse (reverse playback and input)
 - GameShell top bar with Back, Pause/Resume, and a contextual mode label
-- Audio settings persisted: volume, mute, waveform, and selectable audio packs (Classic, Synth, Soft)
+- Audio settings persisted: volume, mute, waveform. Audio pack selection has been removed in the React client; legacy static web retains optional packs.
 - Works in Vite dev, static web build, and Cordova file-system environments (relative audio paths)
 - One-command builds for Android and Windows via PowerShell scripts
 - CI workflow builds Android package with up-to-date web-react assets
@@ -44,7 +50,7 @@ npm run dev
 
 - Tutorial: learn controls with a demo board and basic instructions
 - Challenges: pick Speed Up or Reverse, then start the game with those rules
-- Settings: adjust volume/mute/waveform and select an audio pack
+- Settings: adjust volume/mute/waveform
 
 ## Build & Distribution
 
@@ -116,8 +122,9 @@ Notes:
 
 - Volume and Mute
 - Waveform (oscillator type)
-- Audio Pack (sample set)
 - Preferences persist via localStorage and are applied on app start
+
+Note: Audio pack selection is currently removed from the React client. Legacy static web builds may still reference audio packs.
 
 ## CI
 
