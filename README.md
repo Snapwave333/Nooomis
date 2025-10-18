@@ -89,9 +89,11 @@ What the script does:
 - Packages the app using Electron
 - Outputs to dist/windows/electron and dist/windows/www
 
-## Audio Packs
+## Audio Packs (legacy/optional)
 
-The React client loads sample-based packs using relative paths for compatibility with both Vite dev and Cordova file:// builds.
+Note: The current React Settings page no longer includes audio pack selection. This section remains for legacy/static builds and Cordova packaging; packs can still be used programmatically or in older UI flows.
+
+The React client supports sample-based packs using relative paths for compatibility with both Vite dev and Cordova file:// builds.
 
 - Location: web-react/public/web/assets/audio/
 - Structure per pack:
@@ -106,7 +108,7 @@ web-react/public/web/assets/audio/<PackName>/
 
 Notes:
 - Files should be short, mono WAV samples (44.1k/48kHz recommended)
-- Pack names are shown in Settings (e.g., Classic, Synth, Soft)
+- Pack selection is not exposed in the current React Settings UI; packs remain for legacy/static builds
 - If you add a new pack, ensure all four toneX.wav files exist
 
 ## Controls

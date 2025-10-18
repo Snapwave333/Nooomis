@@ -3,7 +3,7 @@
 All notable changes to the NOOOMIS project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0/).
 
 ## [Unreleased]
 
@@ -24,26 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Legacy static web (web/**) still references audio packs and remains unchanged
 - CI: Windows Tauri workflow pins tauri-cli to 1.6.0 with --locked to match Tauri v1.6
-
-### Added
-- Unity C# implementation with modular component design
-- Cross-platform input support (touch, mouse, keyboard, gamepad)
-- Multiple audio packs (Classic, Synth, Soft)
-- Theme variations (Neon, Grid, Mono)
-- Settings system with proper UI state management
-- Leaderboard with score persistence
-- Responsive design for mobile and desktop
-
-### Changed
-- Enhanced save system with progression tracking and unlock management
-- Improved UI state management and transitions
-- Optimized audio playback with oscillator pooling
-- Updated project structure with better organization
-
-### Fixed
-- Settings overlay persistence during gameplay
-- Canvas cleanup to prevent memory leaks
-- Audio performance issues with preloading
 
 ## [2.1.0] - 2025-10-17
 
